@@ -1,4 +1,5 @@
-import { Check, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { Check, Sparkles, Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { PageLeadProduct } from '@/hooks/useCompanyPage';
@@ -11,7 +12,7 @@ interface BrandedPricingCardProps {
     cta_color: string;
   };
   index?: number;
-  onOrder?: (product: PageLeadProduct) => void;
+  onOrder?: (product: PageLeadProduct, quantity: number) => void;
 }
 
 export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }: BrandedPricingCardProps) {
@@ -19,6 +20,19 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
   const displayPrice = custom_price ?? product.base_price;
   const isPopular = product.badge === 'MOST POPULAR';
   const hasStandingOrder = product.standing_order_price !== null;
+  const minQuantity = product.min_order_quantity || 1;
+
+  const [quantity, setQuantity] = useState(minQuantity);
+
+  const totalPrice = (displayPrice * quantity).toFixed(2);
+
+  const handleIncrement = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const handleDecrement = () => {
+    setQuantity((prev) => Math.max(minQuantity, prev - 1));
+  };
 
   return (
     <div
@@ -117,9 +131,60 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
               <span className="text-xs text-muted-foreground">/ lead</span>
             </div>
           )}
-          <p className="text-xs text-muted-foreground mt-1">
-            Min. {product.min_order_quantity} leads
-          </p>
+        </div>
+
+        {/* Quantity Selector */}
+        <div className="mb-3 p-3 rounded-xl border border-border/50 bg-muted/30">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-muted-foreground">Quantity</span>
+            <span className="text-[10px] text-muted-foreground">Min. {minQuantity}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleDecrement}
+                disabled={quantity <= minQuantity}
+                className={cn(
+                  'h-8 w-8 rounded-lg flex items-center justify-center transition-all duration-200',
+                  'border border-border/50 bg-background',
+                  'hover:bg-muted active:scale-95',
+                  'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background'
+                )}
+                style={{
+                  borderColor: quantity > minQuantity ? `${branding.primary_color}30` : undefined,
+                }}
+              >
+                <Minus className="h-3.5 w-3.5 text-foreground" />
+              </button>
+              <span className="text-lg font-bold text-foreground w-10 text-center tabular-nums">
+                {quantity}
+              </span>
+              <button
+                type="button"
+                onClick={handleIncrement}
+                className={cn(
+                  'h-8 w-8 rounded-lg flex items-center justify-center transition-all duration-200',
+                  'border bg-background',
+                  'hover:bg-muted active:scale-95'
+                )}
+                style={{
+                  borderColor: `${branding.primary_color}30`,
+                }}
+              >
+                <Plus className="h-3.5 w-3.5 text-foreground" />
+              </button>
+            </div>
+            <div className="text-right">
+              <div 
+                className="text-lg font-bold"
+                style={{ color: branding.accent_color }}
+              >
+                ${totalPrice}
+              </div>
+              <div className="text-[10px] text-muted-foreground">total</div>
+            </div>
+          </div>
         </div>
 
         {/* Conversion rate highlight */}
@@ -178,9 +243,9 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
             backgroundColor: branding.cta_color,
             boxShadow: `0 4px 14px ${branding.cta_color}30`,
           }}
-          onClick={() => onOrder?.(pageProduct)}
+          onClick={() => onOrder?.(pageProduct, quantity)}
         >
-          {product.cta_label}
+          {product.cta_label} · ${totalPrice}
         </Button>
       </div>
     </div>
