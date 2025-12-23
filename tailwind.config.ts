@@ -57,6 +57,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        badge: {
+          premium: "hsl(var(--badge-premium))",
+          popular: "hsl(var(--badge-popular))",
+          value: "hsl(var(--badge-value))",
+          intent: "hsl(var(--badge-intent))",
+        },
+        category: {
+          life: "hsl(var(--category-life))",
+          annuity: "hsl(var(--category-annuity))",
+          ethos: "hsl(var(--category-ethos))",
+          fe: "hsl(var(--category-fe))",
+          calls: "hsl(var(--category-calls))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
