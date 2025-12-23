@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -25,8 +26,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { MoreHorizontal, Pencil, Trash2, ExternalLink, Copy } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, ExternalLink, Copy, LayoutList } from 'lucide-react';
 import { CompanyWithBranding } from '@/hooks/useCompanies';
+import { PageLeadsDialog } from './PageLeadsDialog';
 import { toast } from 'sonner';
 
 interface CompaniesTableProps {
@@ -38,6 +40,7 @@ interface CompaniesTableProps {
 
 export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: CompaniesTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [pageLeadsCompany, setPageLeadsCompany] = useState<CompanyWithBranding | null>(null);
 
   const handleDelete = () => {
     if (deleteId) {
@@ -162,6 +165,11 @@ export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: Comp
                           <Pencil className="h-4 w-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setPageLeadsCompany(company)}>
+                          <LayoutList className="h-4 w-4 mr-2" />
+                          Manage Products
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() => setDeleteId(company.id)}
                           className="text-destructive focus:text-destructive"
@@ -200,6 +208,12 @@ export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: Comp
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PageLeadsDialog
+        company={pageLeadsCompany}
+        open={!!pageLeadsCompany}
+        onOpenChange={(open) => !open && setPageLeadsCompany(null)}
+      />
     </>
   );
 }
