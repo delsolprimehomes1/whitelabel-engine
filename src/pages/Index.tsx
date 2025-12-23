@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Shield, ArrowRight } from 'lucide-react';
+import { Shield, ArrowRight, DollarSign } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -17,6 +17,12 @@ const Index = () => {
           Create unlimited branded checkout pages with centralized Stripe payments.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button asChild size="lg" variant="outline">
+            <Link to="/pricing">
+              <DollarSign className="mr-2 h-4 w-4" />
+              View Pricing
+            </Link>
+          </Button>
           <Button asChild size="lg">
             <Link to="/auth">
               Admin Login
