@@ -81,9 +81,9 @@ export default function BrandedPricing() {
     );
   }
 
-  const handleOrder = (product: typeof displayProducts[0]) => {
+  const handleOrder = (product: typeof displayProducts[0], quantity: number) => {
     // TODO: Implement checkout flow
-    console.log('Order:', product);
+    console.log('Order:', product, 'Quantity:', quantity);
   };
 
   return (
