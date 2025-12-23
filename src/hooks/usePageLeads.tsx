@@ -35,6 +35,28 @@ export function useCompanyPageLeads(companyId: string | undefined) {
   });
 }
 
+export function useAllPageLeadsCounts() {
+  return useQuery({
+    queryKey: ['page-leads-counts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('page_leads')
+        .select('company_id, is_visible');
+
+      if (error) throw error;
+
+      // Count visible page leads per company
+      const counts: Record<string, number> = {};
+      data?.forEach((pl) => {
+        if (pl.is_visible) {
+          counts[pl.company_id] = (counts[pl.company_id] || 0) + 1;
+        }
+      });
+      return counts;
+    },
+  });
+}
+
 export function useUpsertPageLeads() {
   const queryClient = useQueryClient();
 

@@ -29,6 +29,7 @@ import {
 import { MoreHorizontal, Pencil, Trash2, ExternalLink, Copy, LayoutList } from 'lucide-react';
 import { CompanyWithBranding } from '@/hooks/useCompanies';
 import { PageLeadsDialog } from './PageLeadsDialog';
+import { useAllPageLeadsCounts } from '@/hooks/usePageLeads';
 import { toast } from 'sonner';
 
 interface CompaniesTableProps {
@@ -41,6 +42,7 @@ interface CompaniesTableProps {
 export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: CompaniesTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [pageLeadsCompany, setPageLeadsCompany] = useState<CompanyWithBranding | null>(null);
+  const { data: pageLeadsCounts } = useAllPageLeadsCounts();
 
   const handleDelete = () => {
     if (deleteId) {
@@ -63,6 +65,7 @@ export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: Comp
             <TableRow>
               <TableHead>Company</TableHead>
               <TableHead>Slug</TableHead>
+              <TableHead>Products</TableHead>
               <TableHead>Contact</TableHead>
               <TableHead>Branding</TableHead>
               <TableHead>Status</TableHead>
@@ -72,7 +75,7 @@ export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: Comp
           <TableBody>
             {companies.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                   No companies yet. Create your first company to get started.
                 </TableCell>
               </TableRow>
@@ -107,6 +110,11 @@ export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: Comp
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="font-mono">
+                      {pageLeadsCounts?.[company.id] ?? 0}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
