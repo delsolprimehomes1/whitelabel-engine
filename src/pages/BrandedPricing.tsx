@@ -138,7 +138,7 @@ export default function BrandedPricing() {
 
         {/* Pricing Grid - Mobile first */}
         {displayProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 items-stretch">
             {displayProducts.map((pageProduct, index) => (
               <BrandedPricingCard
                 key={pageProduct.id}

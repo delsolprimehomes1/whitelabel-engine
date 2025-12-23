@@ -37,7 +37,7 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
   return (
     <div
       className={cn(
-        'group relative opacity-0 animate-card-enter',
+        'group relative opacity-0 animate-card-enter h-full',
         index === 0 && 'stagger-1',
         index === 1 && 'stagger-2',
         index === 2 && 'stagger-3',
@@ -57,7 +57,7 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
       {/* Main card */}
       <div
         className={cn(
-          'relative rounded-2xl p-4 md:p-5 transition-all duration-500 ease-out',
+          'relative rounded-2xl p-4 md:p-5 transition-all duration-500 ease-out h-full flex flex-col',
           'card-3d-shadow hover:card-3d-shadow-hover',
           'transform hover:-translate-y-2 hover:scale-[1.02]'
         )}
@@ -209,7 +209,7 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
         )}
 
         {/* Features list - compact */}
-        <ul className="space-y-1.5 mb-4">
+        <ul className="space-y-1.5 mb-4 flex-grow">
           {product.features?.slice(0, 4).map((feature, idx) => (
             <li key={idx} className="flex items-start gap-2 text-xs">
               <div
@@ -234,7 +234,7 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
         {/* CTA Button with glow effect */}
         <Button
           className={cn(
-            'w-full text-white font-semibold rounded-xl h-11 text-sm',
+            'w-full text-white font-semibold rounded-xl h-11 text-sm mt-auto',
             'transition-all duration-300',
             'hover:shadow-lg hover:scale-[1.02]',
             'active:scale-[0.98]'
