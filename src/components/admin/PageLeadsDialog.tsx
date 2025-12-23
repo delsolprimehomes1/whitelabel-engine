@@ -131,6 +131,15 @@ export function PageLeadsDialog({ company, open, onOpenChange }: PageLeadsDialog
   };
 
   const visibleCount = pageLeadItems.filter((item) => item.is_visible).length;
+  const totalCount = pageLeadItems.length;
+
+  const handleEnableAll = () => {
+    setPageLeadItems((items) => items.map((item) => ({ ...item, is_visible: true })));
+  };
+
+  const handleDisableAll = () => {
+    setPageLeadItems((items) => items.map((item) => ({ ...item, is_visible: false })));
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -142,6 +151,25 @@ export function PageLeadsDialog({ company, open, onOpenChange }: PageLeadsDialog
             toggle visibility, and set custom pricing overrides.
           </DialogDescription>
         </DialogHeader>
+
+        <div className="flex items-center gap-2 pb-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleEnableAll}
+            disabled={visibleCount === totalCount}
+          >
+            Enable All
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDisableAll}
+            disabled={visibleCount === 0}
+          >
+            Disable All
+          </Button>
+        </div>
 
         <ScrollArea className="flex-1 -mx-6 px-6">
           <div className="space-y-2">
