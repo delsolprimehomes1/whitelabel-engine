@@ -52,7 +52,7 @@ export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: Comp
   };
 
   const copySlugUrl = (slug: string) => {
-    const url = `${window.location.origin}/p/${slug}`;
+    const url = `${window.location.origin}/${slug}`;
     navigator.clipboard.writeText(url);
     toast.success('URL copied to clipboard');
   };
@@ -100,7 +100,7 @@ export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: Comp
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <code className="text-sm bg-muted px-2 py-1 rounded">/p/{company.slug}</code>
+                      <code className="text-sm bg-muted px-2 py-1 rounded">/{company.slug}</code>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -164,7 +164,7 @@ export function CompaniesTable({ companies, onEdit, onDelete, isDeleting }: Comp
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                          onClick={() => window.open(`/p/${company.slug}`, '_blank')}
+                          onClick={() => window.open(`/${company.slug}`, '_blank')}
                         >
                           <ExternalLink className="h-4 w-4 mr-2" />
                           View Page
