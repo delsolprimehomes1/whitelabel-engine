@@ -36,10 +36,10 @@ export default function BrandedPricing() {
 
   if (companyError) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Company Not Found</h1>
-          <p className="text-muted-foreground">The pricing page you're looking for doesn't exist.</p>
+          <h1 className="text-xl font-bold mb-2">Company Not Found</h1>
+          <p className="text-sm text-muted-foreground">The pricing page you're looking for doesn't exist.</p>
         </div>
       </div>
     );
@@ -51,18 +51,18 @@ export default function BrandedPricing() {
         className="min-h-screen"
         style={{
           background: branding.dark_mode
-            ? 'linear-gradient(180deg, hsl(222 47% 8%) 0%, hsl(222 47% 12%) 100%)'
-            : 'linear-gradient(180deg, hsl(0 0% 98%) 0%, hsl(0 0% 100%) 100%)',
+            ? 'linear-gradient(180deg, hsl(222 47% 6%) 0%, hsl(222 47% 10%) 100%)'
+            : 'linear-gradient(180deg, hsl(220 20% 97%) 0%, hsl(220 20% 100%) 100%)',
         }}
       >
-        <div className="container mx-auto px-4 py-12">
-          <div className="text-center mb-12">
-            <Skeleton className="h-16 w-48 mx-auto mb-4" />
-            <Skeleton className="h-8 w-64 mx-auto" />
+        <div className="px-3 py-6 md:px-4 md:py-8 max-w-5xl mx-auto">
+          <div className="text-center mb-6">
+            <Skeleton className="h-10 w-32 mx-auto mb-3 rounded-xl" />
+            <Skeleton className="h-6 w-48 mx-auto rounded-lg" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-96" />
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-80 rounded-2xl" />
             ))}
           </div>
         </div>
@@ -72,10 +72,10 @@ export default function BrandedPricing() {
 
   if (!company) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Company Not Found</h1>
-          <p className="text-muted-foreground">The pricing page you're looking for doesn't exist.</p>
+          <h1 className="text-xl font-bold mb-2">Company Not Found</h1>
+          <p className="text-sm text-muted-foreground">The pricing page you're looking for doesn't exist.</p>
         </div>
       </div>
     );
@@ -88,27 +88,37 @@ export default function BrandedPricing() {
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen relative overflow-hidden"
       style={{
         fontFamily: branding.font_family || 'inherit',
         background: branding.dark_mode
-          ? 'linear-gradient(180deg, hsl(222 47% 8%) 0%, hsl(222 47% 12%) 100%)'
-          : 'linear-gradient(180deg, hsl(0 0% 98%) 0%, hsl(0 0% 100%) 100%)',
+          ? 'linear-gradient(180deg, hsl(222 47% 6%) 0%, hsl(222 47% 10%) 100%)'
+          : 'linear-gradient(180deg, hsl(220 20% 97%) 0%, hsl(220 20% 100%) 100%)',
         color: branding.dark_mode ? 'hsl(0 0% 95%)' : 'inherit',
       }}
     >
-      <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
+      {/* Background decoration */}
+      <div 
+        className="absolute top-0 right-0 w-64 h-64 md:w-96 md:h-96 rounded-full opacity-20 blur-3xl pointer-events-none"
+        style={{ background: branding.primary_color }}
+      />
+      <div 
+        className="absolute bottom-0 left-0 w-48 h-48 md:w-80 md:h-80 rounded-full opacity-15 blur-3xl pointer-events-none"
+        style={{ background: branding.accent_color }}
+      />
+
+      <div className="relative z-10 px-3 py-6 md:px-4 md:py-8 lg:py-12 max-w-5xl mx-auto">
+        {/* Header - Compact on mobile */}
+        <div className="text-center mb-6 md:mb-10">
           {branding.logo_url && (
             <img
               src={branding.logo_url}
               alt={`${company.name} logo`}
-              className="h-16 mx-auto mb-6 object-contain"
+              className="h-10 md:h-14 mx-auto mb-3 md:mb-4 object-contain"
             />
           )}
           <h1
-            className="text-4xl md:text-5xl font-bold mb-4"
+            className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2"
             style={{
               background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.accent_color})`,
               WebkitBackgroundClip: 'text',
@@ -119,51 +129,55 @@ export default function BrandedPricing() {
             {company.name}
           </h1>
           <p
-            className="text-lg max-w-2xl mx-auto"
-            style={{ color: branding.dark_mode ? 'hsl(0 0% 70%)' : 'hsl(0 0% 40%)' }}
+            className="text-sm md:text-base max-w-md mx-auto"
+            style={{ color: branding.dark_mode ? 'hsl(0 0% 65%)' : 'hsl(0 0% 45%)' }}
           >
-            Choose the perfect lead package for your business
+            Choose the perfect lead package
           </p>
         </div>
 
-        {/* Pricing Grid */}
+        {/* Pricing Grid - Mobile first */}
         {displayProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayProducts.map((pageProduct) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
+            {displayProducts.map((pageProduct, index) => (
               <BrandedPricingCard
                 key={pageProduct.id}
                 pageProduct={pageProduct}
                 branding={branding}
+                index={index}
                 onOrder={handleOrder}
               />
             ))}
           </div>
         ) : (
           <div className="text-center py-12">
-            <p style={{ color: branding.dark_mode ? 'hsl(0 0% 70%)' : 'hsl(0 0% 40%)' }}>
+            <p 
+              className="text-sm"
+              style={{ color: branding.dark_mode ? 'hsl(0 0% 65%)' : 'hsl(0 0% 45%)' }}
+            >
               No products available at this time.
             </p>
           </div>
         )}
 
-        {/* Footer */}
-        <div className="mt-16 text-center">
-          {company.contact_email && (
+        {/* Footer - Minimal */}
+        {company.contact_email && (
+          <div className="mt-8 md:mt-12 text-center">
             <p
-              className="text-sm"
-              style={{ color: branding.dark_mode ? 'hsl(0 0% 60%)' : 'hsl(0 0% 50%)' }}
+              className="text-xs md:text-sm"
+              style={{ color: branding.dark_mode ? 'hsl(0 0% 55%)' : 'hsl(0 0% 50%)' }}
             >
-              Questions? Contact us at{' '}
+              Questions?{' '}
               <a
                 href={`mailto:${company.contact_email}`}
                 style={{ color: branding.primary_color }}
-                className="hover:underline"
+                className="hover:underline font-medium"
               >
                 {company.contact_email}
               </a>
             </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
