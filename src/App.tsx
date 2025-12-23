@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Pricing from "./pages/Pricing";
+import BrandedPricing from "./pages/BrandedPricing";
 import Dashboard from "./pages/admin/Dashboard";
 import Companies from "./pages/admin/Companies";
 import Products from "./pages/admin/Products";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/p/:slug" element={<BrandedPricing />} />
             
             {/* Admin Routes - Protected */}
             <Route
