@@ -31,8 +31,6 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/pricing" element={<Pricing />} />
-            <Route path="/p/:slug" element={<BrandedPricing />} />
-            
             {/* Admin Routes - Protected */}
             <Route
               path="/admin"
@@ -82,6 +80,9 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            
+            {/* Dynamic company slug route - MUST be after all fixed routes */}
+            <Route path="/:slug" element={<BrandedPricing />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
