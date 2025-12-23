@@ -128,6 +128,7 @@ export type Database = {
         Row: {
           badge: string | null
           base_price: number
+          category: string | null
           conversion_rate: number | null
           created_at: string
           cta_label: string
@@ -138,11 +139,15 @@ export type Database = {
           is_active: boolean
           min_order_quantity: number
           name: string
+          standing_order_min_quantity: number | null
+          standing_order_min_weeks: number | null
+          standing_order_price: number | null
           updated_at: string
         }
         Insert: {
           badge?: string | null
           base_price: number
+          category?: string | null
           conversion_rate?: number | null
           created_at?: string
           cta_label?: string
@@ -153,11 +158,15 @@ export type Database = {
           is_active?: boolean
           min_order_quantity?: number
           name: string
+          standing_order_min_quantity?: number | null
+          standing_order_min_weeks?: number | null
+          standing_order_price?: number | null
           updated_at?: string
         }
         Update: {
           badge?: string | null
           base_price?: number
+          category?: string | null
           conversion_rate?: number | null
           created_at?: string
           cta_label?: string
@@ -168,6 +177,9 @@ export type Database = {
           is_active?: boolean
           min_order_quantity?: number
           name?: string
+          standing_order_min_quantity?: number | null
+          standing_order_min_weeks?: number | null
+          standing_order_price?: number | null
           updated_at?: string
         }
         Relationships: []
