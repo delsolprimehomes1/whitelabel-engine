@@ -13,8 +13,14 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { Upload, X, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2, Palette } from 'lucide-react';
 import { CompanyWithBranding, CompanyFormData } from '@/hooks/useCompanies';
+import { extractColorsFromImage } from '@/lib/colorExtractor';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface CompanyFormDialogProps {
   open: boolean;
@@ -62,6 +68,9 @@ export function CompanyFormDialog({
   isUploading,
 }: CompanyFormDialogProps) {
   const [formData, setFormData] = useState<CompanyFormData>(defaultFormData);
+  const [extractedColors, setExtractedColors] = useState<string[]>([]);
+  const [isExtractingColors, setIsExtractingColors] = useState(false);
+  const [selectedColorForAssignment, setSelectedColorForAssignment] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -84,6 +93,9 @@ export function CompanyFormDialog({
     } else {
       setFormData(defaultFormData);
     }
+    // Clear extracted colors when dialog opens/closes or company changes
+    setExtractedColors([]);
+    setSelectedColorForAssignment(null);
   }, [company, open]);
 
   const generateSlug = (name: string) => {
@@ -106,14 +118,34 @@ export function CompanyFormDialog({
     if (!file) return;
 
     try {
-      const url = await onUploadLogo(file);
+      // Start color extraction in parallel with upload
+      setIsExtractingColors(true);
+      const [url, colors] = await Promise.all([
+        onUploadLogo(file),
+        extractColorsFromImage(file)
+      ]);
+      
       setFormData((prev) => ({
         ...prev,
         branding: { ...prev.branding, logo_url: url },
       }));
+      setExtractedColors(colors);
     } catch (error) {
       // Error handled in hook
+    } finally {
+      setIsExtractingColors(false);
     }
+  };
+
+  const applyColorTo = (color: string, target: 'primary' | 'accent' | 'cta') => {
+    setFormData((prev) => ({
+      ...prev,
+      branding: {
+        ...prev.branding,
+        [target === 'primary' ? 'primary_color' : target === 'accent' ? 'accent_color' : 'cta_color']: color,
+      },
+    }));
+    setSelectedColorForAssignment(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -284,7 +316,87 @@ export function CompanyFormDialog({
                   </Card>
                 </div>
 
-                {/* Color Pickers */}
+                {/* Extracted Colors from Logo */}
+                {(extractedColors.length > 0 || isExtractingColors) && (
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-2">
+                      <Palette className="h-4 w-4 text-muted-foreground" />
+                      <Label className="text-sm">Colors from Logo</Label>
+                    </div>
+                    {isExtractingColors ? (
+                      <div className="flex items-center gap-2 py-2">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Extracting colors...</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {extractedColors.map((color, index) => (
+                          <Popover
+                            key={color + index}
+                            open={selectedColorForAssignment === color}
+                            onOpenChange={(open) => setSelectedColorForAssignment(open ? color : null)}
+                          >
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                className="h-10 w-10 rounded-lg border-2 border-border hover:border-primary transition-colors shadow-sm hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                style={{ backgroundColor: color }}
+                                title={`Click to apply ${color}`}
+                              />
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-2" align="center">
+                              <div className="flex flex-col gap-1">
+                                <p className="text-xs text-muted-foreground mb-1 px-1">Apply to:</p>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="ghost"
+                                  className="justify-start h-8"
+                                  onClick={() => applyColorTo(color, 'primary')}
+                                >
+                                  <div
+                                    className="h-3 w-3 rounded-full mr-2 border"
+                                    style={{ backgroundColor: formData.branding.primary_color }}
+                                  />
+                                  Primary
+                                </Button>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="ghost"
+                                  className="justify-start h-8"
+                                  onClick={() => applyColorTo(color, 'accent')}
+                                >
+                                  <div
+                                    className="h-3 w-3 rounded-full mr-2 border"
+                                    style={{ backgroundColor: formData.branding.accent_color }}
+                                  />
+                                  Accent
+                                </Button>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="ghost"
+                                  className="justify-start h-8"
+                                  onClick={() => applyColorTo(color, 'cta')}
+                                >
+                                  <div
+                                    className="h-3 w-3 rounded-full mr-2 border"
+                                    style={{ backgroundColor: formData.branding.cta_color }}
+                                  />
+                                  CTA Button
+                                </Button>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Click a color to apply it to primary, accent, or CTA
+                    </p>
+                  </div>
+                )}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="primary_color">Primary Color</Label>
