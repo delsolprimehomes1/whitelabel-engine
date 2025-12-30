@@ -126,39 +126,34 @@ export default function BrandedPricing() {
         }}
       />
 
-      {/* Left Logo Strip - Desktop only */}
+      {/* Left Logo - Single, Rotated Vertical */}
       {branding.logo_url && (
-        <div className="hidden lg:flex fixed left-6 top-1/2 -translate-y-1/2 flex-col gap-6 items-center z-0">
-          {[...Array(5)].map((_, i) => (
-            <img
-              key={`left-${i}`}
-              src={branding.logo_url}
-              alt=""
-              className="w-12 h-12 object-contain opacity-10 hover:opacity-20 transition-opacity duration-300 animate-logo-float"
-              style={{ 
-                filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
-                animationDelay: `${i * 0.8}s`,
-              }}
-            />
-          ))}
+        <div className="hidden lg:flex fixed left-4 top-1/2 -translate-y-1/2 z-0">
+          <img
+            src={branding.logo_url}
+            alt=""
+            className="w-16 h-auto object-contain opacity-15 hover:opacity-25 transition-opacity duration-300 animate-logo-float"
+            style={{ 
+              transform: 'rotate(-90deg)',
+              filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
+            }}
+          />
         </div>
       )}
 
-      {/* Right Logo Strip - Desktop only */}
+      {/* Right Logo - Single, Rotated Vertical */}
       {branding.logo_url && (
-        <div className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 flex-col gap-6 items-center z-0">
-          {[...Array(5)].map((_, i) => (
-            <img
-              key={`right-${i}`}
-              src={branding.logo_url}
-              alt=""
-              className="w-12 h-12 object-contain opacity-10 hover:opacity-20 transition-opacity duration-300 animate-logo-float"
-              style={{ 
-                filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
-                animationDelay: `${i * 0.8 + 0.4}s`,
-              }}
-            />
-          ))}
+        <div className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-0">
+          <img
+            src={branding.logo_url}
+            alt=""
+            className="w-16 h-auto object-contain opacity-15 hover:opacity-25 transition-opacity duration-300 animate-logo-float"
+            style={{ 
+              transform: 'rotate(90deg)',
+              animationDelay: '0.4s',
+              filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
+            }}
+          />
         </div>
       )}
 
