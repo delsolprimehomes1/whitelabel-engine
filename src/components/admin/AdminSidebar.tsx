@@ -45,14 +45,14 @@ export function AdminSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="border-b border-sidebar-border p-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
-            <Shield className="h-4 w-4 text-sidebar-primary-foreground" />
+      <SidebarHeader className="border-b border-sidebar-border p-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sidebar-primary">
+            <Shield className="h-6 w-6 text-sidebar-primary-foreground" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-sidebar-foreground">Lead Admin</span>
-            <span className="text-xs text-sidebar-foreground/60">Control Panel</span>
+            <span className="text-base font-semibold text-sidebar-foreground">Lead Admin</span>
+            <span className="text-sm text-sidebar-foreground/60">Control Panel</span>
           </div>
         </div>
       </SidebarHeader>
