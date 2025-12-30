@@ -134,10 +134,10 @@ export default function BrandedPricing() {
               key={`left-${i}`}
               src={branding.logo_url}
               alt=""
-              className="w-12 h-12 object-contain opacity-10 hover:opacity-20 transition-opacity duration-300"
+              className="w-12 h-12 object-contain opacity-10 hover:opacity-20 transition-opacity duration-300 animate-logo-float"
               style={{ 
                 filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
-                animationDelay: `${i * 0.5}s`,
+                animationDelay: `${i * 0.8}s`,
               }}
             />
           ))}
@@ -152,10 +152,10 @@ export default function BrandedPricing() {
               key={`right-${i}`}
               src={branding.logo_url}
               alt=""
-              className="w-12 h-12 object-contain opacity-10 hover:opacity-20 transition-opacity duration-300"
+              className="w-12 h-12 object-contain opacity-10 hover:opacity-20 transition-opacity duration-300 animate-logo-float"
               style={{ 
                 filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
-                animationDelay: `${i * 0.5}s`,
+                animationDelay: `${i * 0.8 + 0.4}s`,
               }}
             />
           ))}
