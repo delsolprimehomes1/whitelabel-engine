@@ -126,40 +126,22 @@ export default function BrandedPricing() {
         }}
       />
 
-      {/* Left Logo - Single, Rotated Vertical */}
-      {branding.logo_url && (
-        <div className="hidden lg:flex fixed left-4 top-1/2 -translate-y-1/2 z-0">
-          <img
-            src={branding.logo_url}
-            alt=""
-            className="w-16 h-auto object-contain opacity-15 hover:opacity-25 transition-opacity duration-300 animate-logo-float"
-            style={{ 
-              transform: 'rotate(-90deg)',
-              filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
-            }}
-          />
-        </div>
-      )}
-
-      {/* Right Logo - Single, Rotated Vertical */}
-      {branding.logo_url && (
-        <div className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-0">
-          <img
-            src={branding.logo_url}
-            alt=""
-            className="w-16 h-auto object-contain opacity-15 hover:opacity-25 transition-opacity duration-300 animate-logo-float"
-            style={{ 
-              transform: 'rotate(90deg)',
-              animationDelay: '0.4s',
-              filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
-            }}
-          />
-        </div>
-      )}
-
       <div className="relative z-10 px-3 py-5 md:px-4 md:py-8 lg:py-10 max-w-5xl mx-auto">
-        {/* Header */}
+        {/* Header - Compact on mobile */}
         <div className="text-center mb-5 md:mb-8">
+          {branding.logo_url && (
+            <div className="relative inline-block mb-3 md:mb-4">
+              <div 
+                className="absolute inset-0 blur-2xl opacity-50 rounded-full"
+                style={{ background: branding.primary_color }}
+              />
+              <img
+                src={branding.logo_url}
+                alt={`${company.name} logo`}
+                className="relative h-10 md:h-12 lg:h-14 mx-auto object-contain"
+              />
+            </div>
+          )}
           <h1
             className="text-xl md:text-2xl lg:text-3xl font-bold mb-1.5 md:mb-2"
             style={{
