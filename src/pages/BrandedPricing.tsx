@@ -126,22 +126,45 @@ export default function BrandedPricing() {
         }}
       />
 
+      {/* Left Logo Strip - Desktop only */}
+      {branding.logo_url && (
+        <div className="hidden lg:flex fixed left-6 top-1/2 -translate-y-1/2 flex-col gap-6 items-center z-0">
+          {[...Array(5)].map((_, i) => (
+            <img
+              key={`left-${i}`}
+              src={branding.logo_url}
+              alt=""
+              className="w-12 h-12 object-contain opacity-10 hover:opacity-20 transition-opacity duration-300"
+              style={{ 
+                filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
+                animationDelay: `${i * 0.5}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Right Logo Strip - Desktop only */}
+      {branding.logo_url && (
+        <div className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 flex-col gap-6 items-center z-0">
+          {[...Array(5)].map((_, i) => (
+            <img
+              key={`right-${i}`}
+              src={branding.logo_url}
+              alt=""
+              className="w-12 h-12 object-contain opacity-10 hover:opacity-20 transition-opacity duration-300"
+              style={{ 
+                filter: branding.dark_mode ? 'brightness(1.5)' : 'none',
+                animationDelay: `${i * 0.5}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
       <div className="relative z-10 px-3 py-5 md:px-4 md:py-8 lg:py-10 max-w-5xl mx-auto">
-        {/* Header - Compact on mobile */}
+        {/* Header */}
         <div className="text-center mb-5 md:mb-8">
-          {branding.logo_url && (
-            <div className="relative inline-block mb-3 md:mb-4">
-              <div 
-                className="absolute inset-0 blur-2xl opacity-50 rounded-full"
-                style={{ background: branding.primary_color }}
-              />
-              <img
-                src={branding.logo_url}
-                alt={`${company.name} logo`}
-                className="relative h-10 md:h-12 lg:h-14 mx-auto object-contain"
-              />
-            </div>
-          )}
           <h1
             className="text-xl md:text-2xl lg:text-3xl font-bold mb-1.5 md:mb-2"
             style={{
