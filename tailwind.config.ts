@@ -129,6 +129,10 @@ export default {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
+        "logo-float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -143,6 +147,7 @@ export default {
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
         "orb-float": "orb-float 20s ease-in-out infinite",
         "border-spin": "border-spin 8s linear infinite",
+        "logo-float": "logo-float 4s ease-in-out infinite",
       },
     },
   },
