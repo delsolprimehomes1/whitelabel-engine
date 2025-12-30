@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Sparkles, Minus, Plus } from 'lucide-react';
+import { Check, Sparkles, Minus, Plus, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { PageLeadProduct } from '@/hooks/useCompanyPage';
@@ -10,6 +10,7 @@ interface BrandedPricingCardProps {
     primary_color: string;
     accent_color: string;
     cta_color: string;
+    dark_mode?: boolean;
   };
   index?: number;
   onOrder?: (product: PageLeadProduct, quantity: number) => void;
@@ -21,10 +22,14 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
   const isPopular = product.badge === 'MOST POPULAR';
   const hasStandingOrder = product.standing_order_price !== null;
   const minQuantity = product.min_order_quantity || 1;
+  const isDark = branding.dark_mode;
 
   const [quantity, setQuantity] = useState(minQuantity);
+  const [showAllFeatures, setShowAllFeatures] = useState(false);
 
   const totalPrice = (displayPrice * quantity).toFixed(2);
+  const visibleFeatures = showAllFeatures ? product.features : product.features?.slice(0, 3);
+  const hasMoreFeatures = (product.features?.length || 0) > 3;
 
   const handleIncrement = () => {
     setQuantity((prev) => prev + 1);
@@ -45,33 +50,38 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
         index === 4 && 'stagger-5',
         index === 5 && 'stagger-6'
       )}
+      style={{
+        '--primary-color': branding.primary_color,
+        '--accent-color': branding.accent_color,
+      } as React.CSSProperties}
     >
-      {/* Gradient border wrapper */}
+      {/* Animated gradient border on hover */}
       <div
-        className="absolute -inset-[2px] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"
+        className="absolute -inset-[2px] rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{
-          background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.accent_color})`,
+          background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.accent_color}, ${branding.primary_color})`,
+          backgroundSize: '200% 200%',
+          animation: 'gradient-shift 4s linear infinite',
+          filter: 'blur(4px)',
         }}
       />
       
       {/* Main card */}
       <div
         className={cn(
-          'relative rounded-2xl p-4 md:p-5 transition-all duration-500 ease-out h-full flex flex-col',
-          'card-3d-shadow hover:card-3d-shadow-hover',
-          'transform hover:-translate-y-2 hover:scale-[1.02]'
+          'relative rounded-3xl p-3 md:p-4 transition-all duration-500 ease-out h-full flex flex-col',
+          'card-3d-enhanced tilt-3d-hover',
+          isDark ? 'glass-dark-enhanced inner-glow-dark' : 'glass-enhanced inner-glow'
         )}
         style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(20px)',
           boxShadow: isPopular 
-            ? `0 0 0 2px ${branding.accent_color}, 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 20px 25px -5px rgba(0, 0, 0, 0.05)`
+            ? `0 0 0 2px ${branding.accent_color}, 0 8px 32px -8px rgba(0, 0, 0, 0.15)`
             : undefined,
         }}
       >
         {/* Top gradient accent line */}
         <div
-          className="absolute top-0 left-4 right-4 h-1 rounded-b-full"
+          className="absolute top-0 left-6 right-6 h-1 rounded-b-full"
           style={{
             background: `linear-gradient(to right, ${branding.primary_color}, ${branding.accent_color})`,
           }}
@@ -81,12 +91,12 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
         {product.badge && (
           <div
             className={cn(
-              'absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold text-white shadow-lg',
-              isPopular && 'animate-float'
+              'absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] md:text-xs font-semibold text-white shadow-lg',
+              isPopular && 'animate-soft-bounce'
             )}
             style={{
               background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.accent_color})`,
-              boxShadow: `0 4px 14px ${branding.accent_color}40`,
+              boxShadow: `0 4px 20px ${branding.accent_color}50`,
             }}
           >
             <span className="flex items-center gap-1">
@@ -96,110 +106,160 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
           </div>
         )}
 
-        {/* Header */}
-        <div className={cn('pt-2', product.badge && 'pt-4')}>
-          <h3 className="font-bold text-base md:text-lg text-foreground leading-tight">
+        {/* Header - Compact */}
+        <div className={cn('pt-1', product.badge && 'pt-3')}>
+          <h3 
+            className="font-bold text-sm md:text-base leading-tight"
+            style={{ color: isDark ? 'hsl(0 0% 95%)' : 'hsl(222 47% 11%)' }}
+          >
             {product.name}
           </h3>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2">
+          <p 
+            className="text-[11px] md:text-xs mt-0.5 line-clamp-2"
+            style={{ color: isDark ? 'hsl(0 0% 60%)' : 'hsl(0 0% 50%)' }}
+          >
             {product.description}
           </p>
         </div>
 
-        {/* Pricing */}
-        <div className="mt-4 mb-3">
+        {/* Pricing - Inline compact layout */}
+        <div className="mt-3 mb-2.5">
           {hasStandingOrder ? (
-            <div className="space-y-1">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-2xl md:text-3xl font-bold text-foreground">${displayPrice}</span>
-                <span className="text-xs text-muted-foreground">/ lead</span>
+            <div className="flex items-end justify-between gap-2">
+              <div>
+                <div className="flex items-baseline gap-1">
+                  <span 
+                    className="text-xl md:text-2xl font-bold"
+                    style={{ color: isDark ? 'hsl(0 0% 95%)' : 'hsl(222 47% 11%)' }}
+                  >
+                    ${displayPrice}
+                  </span>
+                  <span 
+                    className="text-[10px]"
+                    style={{ color: isDark ? 'hsl(0 0% 55%)' : 'hsl(0 0% 50%)' }}
+                  >
+                    /lead
+                  </span>
+                </div>
               </div>
               <div 
-                className="flex items-baseline gap-1.5"
-                style={{ color: branding.accent_color }}
+                className="text-right px-2 py-1 rounded-lg"
+                style={{ backgroundColor: `${branding.accent_color}15` }}
               >
-                <span className="text-lg md:text-xl font-bold">${product.standing_order_price}</span>
-                <span className="text-xs">/ standing</span>
+                <div 
+                  className="text-sm md:text-base font-bold"
+                  style={{ color: branding.accent_color }}
+                >
+                  ${product.standing_order_price}
+                </div>
+                <div 
+                  className="text-[9px]"
+                  style={{ color: branding.accent_color }}
+                >
+                  standing · {product.standing_order_min_weeks}wk
+                </div>
               </div>
-              <p className="text-[10px] text-muted-foreground">
-                Min {product.standing_order_min_weeks}wk, {product.standing_order_min_quantity} leads
-              </p>
             </div>
           ) : (
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl md:text-3xl font-bold text-foreground">${displayPrice}</span>
-              <span className="text-xs text-muted-foreground">/ lead</span>
+            <div className="flex items-baseline gap-1">
+              <span 
+                className="text-xl md:text-2xl font-bold"
+                style={{ color: isDark ? 'hsl(0 0% 95%)' : 'hsl(222 47% 11%)' }}
+              >
+                ${displayPrice}
+              </span>
+              <span 
+                className="text-[10px]"
+                style={{ color: isDark ? 'hsl(0 0% 55%)' : 'hsl(0 0% 50%)' }}
+              >
+                /lead
+              </span>
             </div>
           )}
         </div>
 
-        {/* Quantity Selector */}
-        <div className="mb-3 p-3 rounded-xl border border-border/50 bg-muted/30">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-muted-foreground">Quantity</span>
-            <span className="text-[10px] text-muted-foreground">Min. {minQuantity}</span>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
+        {/* Quantity Selector - Compact touch-friendly */}
+        <div 
+          className="mb-2.5 p-2.5 rounded-2xl border transition-all duration-300"
+          style={{ 
+            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+            borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={handleDecrement}
                 disabled={quantity <= minQuantity}
                 className={cn(
-                  'h-8 w-8 rounded-lg flex items-center justify-center transition-all duration-200',
-                  'border border-border/50 bg-background',
-                  'hover:bg-muted active:scale-95',
-                  'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-background'
+                  'h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 touch-target',
+                  'active:scale-90',
+                  'disabled:opacity-30 disabled:cursor-not-allowed'
                 )}
                 style={{
-                  borderColor: quantity > minQuantity ? `${branding.primary_color}30` : undefined,
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.8)',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
                 }}
               >
-                <Minus className="h-3.5 w-3.5 text-foreground" />
+                <Minus className="h-3.5 w-3.5" style={{ color: isDark ? 'hsl(0 0% 70%)' : 'hsl(0 0% 40%)' }} />
               </button>
-              <span className="text-lg font-bold text-foreground w-10 text-center tabular-nums">
+              <span 
+                className="text-base font-bold w-8 text-center tabular-nums"
+                style={{ color: isDark ? 'hsl(0 0% 95%)' : 'hsl(222 47% 11%)' }}
+              >
                 {quantity}
               </span>
               <button
                 type="button"
                 onClick={handleIncrement}
                 className={cn(
-                  'h-8 w-8 rounded-lg flex items-center justify-center transition-all duration-200',
-                  'border bg-background',
-                  'hover:bg-muted active:scale-95'
+                  'h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 touch-target',
+                  'active:scale-90'
                 )}
                 style={{
-                  borderColor: `${branding.primary_color}30`,
+                  backgroundColor: `${branding.primary_color}15`,
+                  border: `1px solid ${branding.primary_color}30`,
                 }}
               >
-                <Plus className="h-3.5 w-3.5 text-foreground" />
+                <Plus className="h-3.5 w-3.5" style={{ color: branding.primary_color }} />
               </button>
             </div>
             <div className="text-right">
               <div 
-                className="text-lg font-bold"
+                className="text-base md:text-lg font-bold"
                 style={{ color: branding.accent_color }}
               >
                 ${totalPrice}
               </div>
-              <div className="text-[10px] text-muted-foreground">total</div>
+              <div 
+                className="text-[9px] -mt-0.5"
+                style={{ color: isDark ? 'hsl(0 0% 50%)' : 'hsl(0 0% 55%)' }}
+              >
+                total · min {minQuantity}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Conversion rate highlight */}
+        {/* Conversion rate highlight - Compact */}
         {product.conversion_rate && (
           <div
-            className="mb-3 p-2.5 rounded-xl border transition-all duration-300 group-hover:scale-[1.02]"
+            className="mb-2.5 px-3 py-2 rounded-xl border transition-all duration-300 group-hover:scale-[1.01]"
             style={{
               backgroundColor: `${branding.accent_color}08`,
               borderColor: `${branding.accent_color}20`,
             }}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Conversion</span>
               <span 
-                className="text-lg font-bold"
+                className="text-[10px] font-medium"
+                style={{ color: isDark ? 'hsl(0 0% 60%)' : 'hsl(0 0% 50%)' }}
+              >
+                Conversion Rate
+              </span>
+              <span 
+                className="text-base font-bold"
                 style={{ color: branding.accent_color }}
               >
                 {product.conversion_rate}%
@@ -208,40 +268,59 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
           </div>
         )}
 
-        {/* Features list - compact */}
-        <ul className="space-y-1.5 mb-4 flex-grow">
-          {product.features?.slice(0, 4).map((feature, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-xs">
-              <div
-                className="mt-0.5 h-4 w-4 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: `${branding.accent_color}15` }}
-              >
-                <Check
-                  className="h-2.5 w-2.5"
-                  style={{ color: branding.accent_color }}
-                />
-              </div>
-              <span className="text-muted-foreground leading-tight">{feature}</span>
-            </li>
-          ))}
-          {product.features && product.features.length > 4 && (
-            <li className="text-xs text-muted-foreground pl-6">
-              +{product.features.length - 4} more
-            </li>
+        {/* Features list - Collapsible compact */}
+        <div className="flex-grow">
+          <ul className="space-y-1 mb-2.5">
+            {visibleFeatures?.map((feature, idx) => (
+              <li key={idx} className="flex items-start gap-1.5 text-[11px]">
+                <div
+                  className="mt-0.5 h-3.5 w-3.5 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: `${branding.accent_color}15` }}
+                >
+                  <Check
+                    className="h-2 w-2"
+                    style={{ color: branding.accent_color }}
+                  />
+                </div>
+                <span 
+                  className="leading-tight"
+                  style={{ color: isDark ? 'hsl(0 0% 65%)' : 'hsl(0 0% 45%)' }}
+                >
+                  {feature}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {hasMoreFeatures && (
+            <button
+              type="button"
+              onClick={() => setShowAllFeatures(!showAllFeatures)}
+              className="flex items-center gap-1 text-[10px] font-medium transition-colors"
+              style={{ color: branding.primary_color }}
+            >
+              <ChevronDown 
+                className={cn(
+                  'h-3 w-3 transition-transform duration-200',
+                  showAllFeatures && 'rotate-180'
+                )} 
+              />
+              {showAllFeatures ? 'Show less' : `+${(product.features?.length || 0) - 3} more`}
+            </button>
           )}
-        </ul>
+        </div>
 
         {/* CTA Button with glow effect */}
         <Button
           className={cn(
-            'w-full text-white font-semibold rounded-xl h-11 text-sm mt-auto',
+            'w-full text-white font-semibold rounded-2xl h-11 text-sm mt-auto',
             'transition-all duration-300',
-            'hover:shadow-lg hover:scale-[1.02]',
-            'active:scale-[0.98]'
+            'hover:scale-[1.02] hover:shadow-xl',
+            'active:scale-[0.98]',
+            'cta-glow-pulse touch-target'
           )}
           style={{
-            backgroundColor: branding.cta_color,
-            boxShadow: `0 4px 14px ${branding.cta_color}30`,
+            background: `linear-gradient(135deg, ${branding.cta_color}, ${branding.accent_color})`,
+            boxShadow: `0 4px 20px ${branding.cta_color}40`,
           }}
           onClick={() => onOrder?.(pageProduct, quantity)}
         >
