@@ -57,7 +57,7 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
     >
       {/* Animated gradient border on hover - behind card */}
       <div
-        className="absolute -inset-[2px] rounded-3xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 -z-10"
+        className="absolute -inset-[2px] rounded-3xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 -z-10"
         style={{
           background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.accent_color}, ${branding.primary_color})`,
           backgroundSize: '200% 200%',
