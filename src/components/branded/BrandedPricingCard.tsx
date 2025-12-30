@@ -55,21 +55,20 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
         '--accent-color': branding.accent_color,
       } as React.CSSProperties}
     >
-      {/* Animated gradient border on hover */}
+      {/* Animated gradient border on hover - behind card */}
       <div
-        className="absolute -inset-[2px] rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        className="absolute -inset-[2px] rounded-3xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 -z-10"
         style={{
           background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.accent_color}, ${branding.primary_color})`,
           backgroundSize: '200% 200%',
           animation: 'gradient-shift 4s linear infinite',
-          filter: 'blur(4px)',
         }}
       />
       
-      {/* Main card */}
+      {/* Main card - always on top */}
       <div
         className={cn(
-          'relative rounded-3xl p-3 md:p-4 transition-all duration-500 ease-out h-full flex flex-col',
+          'relative z-10 rounded-3xl p-3 md:p-4 transition-all duration-500 ease-out h-full flex flex-col',
           'card-3d-enhanced tilt-3d-hover',
           isDark ? 'glass-dark-enhanced inner-glow-dark' : 'glass-enhanced inner-glow'
         )}
