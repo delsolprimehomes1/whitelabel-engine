@@ -51,8 +51,8 @@ export default function BrandedPricing() {
         className="min-h-screen"
         style={{
           background: branding.dark_mode
-            ? 'linear-gradient(180deg, hsl(222 47% 6%) 0%, hsl(222 47% 10%) 100%)'
-            : 'linear-gradient(180deg, hsl(220 20% 97%) 0%, hsl(220 20% 100%) 100%)',
+            ? '#000000'
+            : 'linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%)',
         }}
       >
         <div className="px-3 py-6 md:px-4 md:py-8 max-w-5xl mx-auto">
@@ -91,38 +91,48 @@ export default function BrandedPricing() {
       className={`min-h-screen relative overflow-hidden ${branding.dark_mode ? 'animated-gradient-bg-dark' : 'animated-gradient-bg'}`}
       style={{
         fontFamily: branding.font_family || 'inherit',
-        color: branding.dark_mode ? 'hsl(0 0% 95%)' : 'inherit',
+        color: branding.dark_mode ? '#FFFFFF' : 'inherit',
       }}
     >
-      {/* Floating orbs background */}
+      {/* Floating orbs background - vibrant gradients */}
       <div 
         className="floating-orb w-[300px] h-[300px] md:w-[500px] md:h-[500px] top-[-100px] right-[-100px] md:top-[-150px] md:right-[-100px]"
         style={{ 
-          background: `radial-gradient(circle, ${branding.primary_color}60 0%, transparent 70%)`,
+          background: branding.dark_mode 
+            ? 'linear-gradient(135deg, #A855F7 0%, #EC4899 100%)'
+            : `radial-gradient(circle, ${branding.primary_color}60 0%, transparent 70%)`,
+          opacity: branding.dark_mode ? 0.2 : 0.4,
           animationDelay: '0s',
         }}
       />
       <div 
         className="floating-orb w-[250px] h-[250px] md:w-[400px] md:h-[400px] bottom-[-50px] left-[-80px] md:bottom-[-100px] md:left-[-100px]"
         style={{ 
-          background: `radial-gradient(circle, ${branding.accent_color}50 0%, transparent 70%)`,
+          background: branding.dark_mode 
+            ? 'linear-gradient(135deg, #6366F1 0%, #D946EF 100%)'
+            : `radial-gradient(circle, ${branding.accent_color}50 0%, transparent 70%)`,
+          opacity: branding.dark_mode ? 0.15 : 0.4,
           animationDelay: '-7s',
         }}
       />
       <div 
         className="floating-orb w-[200px] h-[200px] md:w-[300px] md:h-[300px] top-[40%] left-[50%] hidden md:block"
         style={{ 
-          background: `radial-gradient(circle, ${branding.cta_color}30 0%, transparent 70%)`,
+          background: branding.dark_mode 
+            ? 'linear-gradient(135deg, #F59E0B 0%, #EC4899 100%)'
+            : `radial-gradient(circle, ${branding.cta_color}30 0%, transparent 70%)`,
+          opacity: branding.dark_mode ? 0.1 : 0.4,
           animationDelay: '-14s',
         }}
       />
 
       {/* Subtle dot pattern overlay */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-30"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(${branding.dark_mode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'} 1px, transparent 1px)`,
+          backgroundImage: `radial-gradient(${branding.dark_mode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)'} 1px, transparent 1px)`,
           backgroundSize: '24px 24px',
+          opacity: branding.dark_mode ? 1 : 0.3,
         }}
       />
 
@@ -157,7 +167,7 @@ export default function BrandedPricing() {
           </h1>
           <p
             className="text-xs md:text-sm max-w-sm mx-auto"
-            style={{ color: branding.dark_mode ? 'hsl(0 0% 65%)' : 'hsl(0 0% 45%)' }}
+            style={{ color: branding.dark_mode ? 'rgba(255, 255, 255, 0.75)' : 'hsl(0 0% 45%)' }}
           >
             Choose the perfect lead package for your business
           </p>
@@ -180,7 +190,7 @@ export default function BrandedPricing() {
           <div className="text-center py-12">
             <p 
               className="text-sm"
-              style={{ color: branding.dark_mode ? 'hsl(0 0% 65%)' : 'hsl(0 0% 45%)' }}
+              style={{ color: branding.dark_mode ? 'rgba(255, 255, 255, 0.5)' : 'hsl(0 0% 45%)' }}
             >
               No products available at this time.
             </p>
@@ -192,7 +202,7 @@ export default function BrandedPricing() {
           <div className="mt-6 md:mt-10 text-center">
             <p
               className="text-xs"
-              style={{ color: branding.dark_mode ? 'hsl(0 0% 55%)' : 'hsl(0 0% 50%)' }}
+              style={{ color: branding.dark_mode ? 'rgba(255, 255, 255, 0.5)' : 'hsl(0 0% 50%)' }}
             >
               Questions?{' '}
               <a

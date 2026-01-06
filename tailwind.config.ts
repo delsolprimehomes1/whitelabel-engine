@@ -2,7 +2,12 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -19,6 +24,9 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        surface: "hsl(var(--bg-surface))",
+        elevated: "hsl(var(--bg-elevated))",
+        "text-tertiary": "hsl(var(--text-tertiary))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -58,17 +66,14 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         badge: {
-          premium: "hsl(var(--badge-premium))",
           popular: "hsl(var(--badge-popular))",
-          value: "hsl(var(--badge-value))",
-          intent: "hsl(var(--badge-intent))",
+          premium: "hsl(var(--badge-premium))",
+          new: "hsl(var(--badge-new))",
         },
         category: {
-          life: "hsl(var(--category-life))",
-          annuity: "hsl(var(--category-annuity))",
-          ethos: "hsl(var(--category-ethos))",
-          fe: "hsl(var(--category-fe))",
-          calls: "hsl(var(--category-calls))",
+          exclusive: "hsl(var(--category-exclusive))",
+          standard: "hsl(var(--category-standard))",
+          budget: "hsl(var(--category-budget))",
         },
       },
       borderRadius: {
@@ -85,19 +90,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "card-enter": {
-          "0%": { opacity: "0", transform: "translateY(30px) scale(0.9) rotateX(10deg)" },
-          "100%": { opacity: "1", transform: "translateY(0) scale(1) rotateX(0deg)" },
-        },
-        "float": {
+        float: {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-10px)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px var(--pulse-color, rgba(139, 92, 246, 0.4))" },
-          "50%": { boxShadow: "0 0 40px var(--pulse-color, rgba(139, 92, 246, 0.6))" },
+          "0%, 100%": { boxShadow: "0 0 20px rgba(168, 85, 247, 0.3)" },
+          "50%": { boxShadow: "0 0 40px rgba(168, 85, 247, 0.6)" },
         },
-        "shimmer": {
+        shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
@@ -108,41 +109,38 @@ export default {
         },
         "tilt-3d": {
           "0%, 100%": { transform: "perspective(1000px) rotateX(0deg) rotateY(0deg)" },
-          "25%": { transform: "perspective(1000px) rotateX(2deg) rotateY(3deg)" },
-          "75%": { transform: "perspective(1000px) rotateX(-2deg) rotateY(-3deg)" },
+          "25%": { transform: "perspective(1000px) rotateX(2deg) rotateY(-2deg)" },
+          "75%": { transform: "perspective(1000px) rotateX(-2deg) rotateY(2deg)" },
         },
         "soft-bounce": {
           "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-4px)" },
+          "50%": { transform: "translateY(-5px)" },
         },
         "glow-pulse": {
-          "0%, 100%": { opacity: "0.4", transform: "scale(1)" },
-          "50%": { opacity: "0.8", transform: "scale(1.05)" },
+          "0%, 100%": { boxShadow: "0 0 20px rgba(168, 85, 247, 0.4)" },
+          "50%": { boxShadow: "0 0 40px rgba(168, 85, 247, 0.7), 0 0 60px rgba(236, 72, 153, 0.3)" },
         },
         "orb-float": {
-          "0%": { transform: "translate(0, 0) scale(1)" },
-          "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(30px, -30px) scale(1.1)" },
           "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
-          "100%": { transform: "translate(0, 0) scale(1)" },
         },
         "border-spin": {
-          "0%": { transform: "rotate(0deg)" },
-          "100%": { transform: "rotate(360deg)" },
+          "100%": { "--border-angle": "360deg" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "card-enter": "card-enter 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards",
-        "float": "float 3s ease-in-out infinite",
+        float: "float 3s ease-in-out infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "shimmer": "shimmer 2s linear infinite",
-        "gradient-shift": "gradient-shift 6s ease infinite",
+        shimmer: "shimmer 2s linear infinite",
+        "gradient-shift": "gradient-shift 15s ease infinite",
         "tilt-3d": "tilt-3d 6s ease-in-out infinite",
         "soft-bounce": "soft-bounce 2s ease-in-out infinite",
-        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
-        "orb-float": "orb-float 20s ease-in-out infinite",
-        "border-spin": "border-spin 8s linear infinite",
+        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
+        "orb-float": "orb-float 8s ease-in-out infinite",
+        "border-spin": "border-spin 4s linear infinite",
       },
     },
   },
