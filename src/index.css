@@ -8,49 +8,36 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 220 16% 96%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Light Mode */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
+    --popover-foreground: 0 0% 3.9%;
     --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
     --accent: 142 71% 45%;
     --accent-foreground: 0 0% 100%;
-
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
     --ring: 221 83% 53%;
-
     --radius: 0.5rem;
-
-    /* Badge colors */
-    --badge-premium: 262 83% 58%;
-    --badge-popular: 142 71% 45%;
-    --badge-value: 38 92% 50%;
-    --badge-intent: 199 89% 48%;
-
-    /* Category colors */
-    --category-life: 221 83% 53%;
-    --category-annuity: 262 83% 58%;
-    --category-ethos: 199 89% 48%;
-    --category-fe: 142 71% 45%;
-    --category-calls: 38 92% 50%;
-
+    
+    /* Surface elevations */
+    --bg-surface: 0 0% 98%;
+    --bg-elevated: 0 0% 100%;
+    
+    /* Text hierarchy */
+    --text-tertiary: 0 0% 60%;
+    
+    /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 221 83% 53%;
@@ -59,49 +46,80 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 221 83% 53%;
+
+    /* Badge colors */
+    --badge-popular: 280 100% 70%;
+    --badge-premium: 45 100% 51%;
+    --badge-new: 160 84% 39%;
+
+    /* Category colors */
+    --category-exclusive: 280 100% 70%;
+    --category-standard: 217.2 91.2% 59.8%;
+    --category-budget: 160 84% 39%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 50% 8%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
+    /* True Black Backgrounds */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    
+    /* Surface elevations */
+    --bg-surface: 0 0% 5%;
+    --bg-elevated: 0 0% 10%;
+    
+    /* Cards use elevated surface */
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
+    
+    /* Primary colors */
     --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
+    --primary-foreground: 0 0% 98%;
+    
+    /* Secondary/Muted */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 75%;
+    
+    /* Accent */
     --accent: 142 71% 45%;
-    --accent-foreground: 210 40% 98%;
-
+    --accent-foreground: 0 0% 98%;
+    
+    /* Destructive */
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders - Subtle */
+    --border: 0 0% 6%;
+    --input: 0 0% 15%;
     --ring: 221 83% 53%;
+    
+    /* Text hierarchy */
+    --text-tertiary: 0 0% 50%;
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
+    /* Sidebar - True Black */
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 75%;
     --sidebar-primary: 221 83% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 221 83% 53%;
-  }
-}
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 6%;
+    --sidebar-ring: 280 100% 70%;
 
-@layer base {
+    /* Badge colors - More vibrant */
+    --badge-popular: 280 100% 70%;
+    --badge-premium: 45 100% 51%;
+    --badge-new: 160 84% 39%;
+
+    /* Category colors - More vibrant */
+    --category-exclusive: 280 100% 70%;
+    --category-standard: 217.2 91.2% 59.8%;
+    --category-budget: 160 84% 39%;
+  }
+
   * {
     @apply border-border;
   }
@@ -112,6 +130,20 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  /* Vibrant Gradients */
+  .gradient-primary-vibrant {
+    background: linear-gradient(135deg, #A855F7 0%, #EC4899 50%, #F59E0B 100%);
+  }
+
+  .gradient-accent-vibrant {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #D946EF 100%);
+  }
+
+  .gradient-success-vibrant {
+    background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+  }
+
+  /* Legacy gradients */
   .gradient-premium {
     background: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(221 83% 53%) 100%);
   }
@@ -177,7 +209,28 @@ All colors MUST be HSL.
   .stagger-5 { animation-delay: 0.25s; }
   .stagger-6 { animation-delay: 0.3s; }
 
-  /* Enhanced Glassmorphism */
+  /* Refined Glassmorphism - Subtle */
+  .glass-subtle {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+  }
+
+  /* Refined Glassmorphism - Medium */
+  .glass-medium {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+  }
+
+  /* Refined Glassmorphism - Strong */
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(48px);
+    -webkit-backdrop-filter: blur(48px);
+  }
+
+  /* Legacy glassmorphism - Light mode */
   .glass {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
@@ -195,41 +248,59 @@ All colors MUST be HSL.
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
 
+  /* Dark mode glassmorphism - Refined */
   .glass-dark {
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
   }
 
   .glass-dark-enhanced {
-    background: linear-gradient(
-      135deg,
-      rgba(30, 30, 40, 0.98) 0%,
-      rgba(20, 20, 30, 0.95) 100%
-    );
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(13, 13, 13, 0.95);
+    backdrop-filter: blur(48px) saturate(180%);
+    -webkit-backdrop-filter: blur(48px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  /* Animated Gradient Background */
+  /* Border utilities */
+  .border-subtle {
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .border-glow {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  }
+
+  .border-glow-pink {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+  }
+
+  .border-glow-amber {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+  }
+
+  /* Animated Gradient Background - Light mode */
   .animated-gradient-bg {
     background: linear-gradient(-45deg, 
-      hsl(220 20% 97%),
-      hsl(220 30% 95%),
-      hsl(240 20% 96%),
-      hsl(210 25% 97%)
+      hsl(0 0% 100%),
+      hsl(280 100% 98%),
+      hsl(217 100% 98%),
+      hsl(160 100% 98%)
     );
     background-size: 400% 400%;
     animation: gradient-shift 15s ease infinite;
   }
 
+  /* Animated Gradient Background - Dark mode with true blacks */
   .animated-gradient-bg-dark {
     background: linear-gradient(-45deg, 
-      hsl(222 47% 6%),
-      hsl(230 40% 8%),
-      hsl(240 35% 7%),
-      hsl(220 45% 6%)
+      hsl(0 0% 0%),
+      hsl(280 50% 3%),
+      hsl(260 50% 3%),
+      hsl(300 50% 3%)
     );
     background-size: 400% 400%;
     animation: gradient-shift 15s ease infinite;
@@ -284,13 +355,14 @@ All colors MUST be HSL.
   .text-shimmer {
     background: linear-gradient(
       90deg,
-      currentColor 0%,
-      rgba(255, 255, 255, 0.8) 50%,
-      currentColor 100%
+      hsl(0 0% 100%) 0%,
+      hsl(280 100% 85%) 50%,
+      hsl(0 0% 100%) 100%
     );
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
     animation: shimmer 3s ease-in-out infinite;
   }
 
@@ -298,7 +370,7 @@ All colors MUST be HSL.
   .floating-orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(60px);
+    filter: blur(80px);
     opacity: 0.4;
     animation: orb-float 20s ease-in-out infinite;
   }
@@ -324,6 +396,43 @@ All colors MUST be HSL.
   }
 
   .inner-glow-dark {
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
   }
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: -200% 0; }
+  50% { background-position: 200% 0; }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-card-enter {
+  animation: card-enter 0.5s ease-out forwards;
 }

@@ -65,7 +65,7 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
         }}
       />
       
-      {/* Main card - always on top */}
+      {/* Main card - always on top with refined glassmorphism */}
       <div
         className={cn(
           'relative z-10 rounded-3xl p-3 md:p-4 transition-all duration-500 ease-out h-full flex flex-col',
@@ -73,9 +73,14 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
           isDark ? 'glass-dark-enhanced inner-glow-dark' : 'glass-enhanced inner-glow'
         )}
         style={{
-          boxShadow: isPopular 
-            ? `0 0 0 2px ${branding.accent_color}, 0 8px 32px -8px rgba(0, 0, 0, 0.15)`
+          background: isDark 
+            ? 'rgba(13, 13, 13, 0.95)'
             : undefined,
+          boxShadow: isPopular 
+            ? `0 0 0 2px ${branding.accent_color}, 0 8px 32px -8px rgba(0, 0, 0, 0.25), 0 0 20px ${branding.accent_color}30`
+            : isDark
+              ? '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.06)'
+              : undefined,
         }}
       >
         {/* Top gradient accent line */}
@@ -109,13 +114,13 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
         <div className={cn('pt-1', product.badge && 'pt-3')}>
           <h3 
             className="font-bold text-sm md:text-base leading-tight"
-            style={{ color: isDark ? 'hsl(0 0% 95%)' : 'hsl(222 47% 11%)' }}
+            style={{ color: isDark ? '#FFFFFF' : 'hsl(222 47% 11%)' }}
           >
             {product.name}
           </h3>
           <p 
             className="text-[11px] md:text-xs mt-0.5 line-clamp-2"
-            style={{ color: isDark ? 'hsl(0 0% 60%)' : 'hsl(0 0% 50%)' }}
+            style={{ color: isDark ? 'rgba(255, 255, 255, 0.75)' : 'hsl(0 0% 50%)' }}
           >
             {product.description}
           </p>
@@ -129,13 +134,13 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
                 <div className="flex items-baseline gap-1">
                   <span 
                     className="text-xl md:text-2xl font-bold"
-                    style={{ color: isDark ? 'hsl(0 0% 95%)' : 'hsl(222 47% 11%)' }}
+                    style={{ color: isDark ? '#FFFFFF' : 'hsl(222 47% 11%)' }}
                   >
                     ${displayPrice}
                   </span>
                   <span 
                     className="text-[10px]"
-                    style={{ color: isDark ? 'hsl(0 0% 55%)' : 'hsl(0 0% 50%)' }}
+                    style={{ color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'hsl(0 0% 50%)' }}
                   >
                     /lead
                   </span>
@@ -163,13 +168,13 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
             <div className="flex items-baseline gap-1">
               <span 
                 className="text-xl md:text-2xl font-bold"
-                style={{ color: isDark ? 'hsl(0 0% 95%)' : 'hsl(222 47% 11%)' }}
+                style={{ color: isDark ? '#FFFFFF' : 'hsl(222 47% 11%)' }}
               >
                 ${displayPrice}
               </span>
               <span 
                 className="text-[10px]"
-                style={{ color: isDark ? 'hsl(0 0% 55%)' : 'hsl(0 0% 50%)' }}
+                style={{ color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'hsl(0 0% 50%)' }}
               >
                 /lead
               </span>
@@ -181,8 +186,8 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
         <div 
           className="mb-2.5 p-2.5 rounded-2xl border transition-all duration-300"
           style={{ 
-            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-            borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+            backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+            borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
           }}
         >
           <div className="flex items-center justify-between">
@@ -197,15 +202,15 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
                   'disabled:opacity-30 disabled:cursor-not-allowed'
                 )}
                 style={{
-                  backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.8)',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.8)',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
                 }}
               >
-                <Minus className="h-3.5 w-3.5" style={{ color: isDark ? 'hsl(0 0% 70%)' : 'hsl(0 0% 40%)' }} />
+                <Minus className="h-3.5 w-3.5" style={{ color: isDark ? 'rgba(255, 255, 255, 0.75)' : 'hsl(0 0% 40%)' }} />
               </button>
               <span 
                 className="text-base font-bold w-8 text-center tabular-nums"
-                style={{ color: isDark ? 'hsl(0 0% 95%)' : 'hsl(222 47% 11%)' }}
+                style={{ color: isDark ? '#FFFFFF' : 'hsl(222 47% 11%)' }}
               >
                 {quantity}
               </span>
@@ -233,7 +238,7 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
               </div>
               <div 
                 className="text-[9px] -mt-0.5"
-                style={{ color: isDark ? 'hsl(0 0% 50%)' : 'hsl(0 0% 55%)' }}
+                style={{ color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'hsl(0 0% 55%)' }}
               >
                 total · min {minQuantity}
               </div>
@@ -253,7 +258,7 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
             <div className="flex items-center justify-between">
               <span 
                 className="text-[10px] font-medium"
-                style={{ color: isDark ? 'hsl(0 0% 60%)' : 'hsl(0 0% 50%)' }}
+                style={{ color: isDark ? 'rgba(255, 255, 255, 0.75)' : 'hsl(0 0% 50%)' }}
               >
                 Conversion Rate
               </span>
@@ -283,7 +288,7 @@ export function BrandedPricingCard({ pageProduct, branding, index = 0, onOrder }
                 </div>
                 <span 
                   className="leading-tight"
-                  style={{ color: isDark ? 'hsl(0 0% 65%)' : 'hsl(0 0% 45%)' }}
+                  style={{ color: isDark ? 'rgba(255, 255, 255, 0.75)' : 'hsl(0 0% 45%)' }}
                 >
                   {feature}
                 </span>
