@@ -12,19 +12,18 @@ export default function BrandedPricing() {
 
   const isLoading = companyLoading || leadsLoading;
 
-  // Default branding if no custom branding set
   const defaultBranding = {
-    primary_color: '#3B82F6',
-    accent_color: '#10B981',
-    cta_color: '#8B5CF6',
+    primary_color: '#6366F1',
+    accent_color: '#8B5CF6',
+    cta_color: '#A855F7',
     logo_url: null,
     font_family: null,
-    dark_mode: false,
+    dark_mode: true,
   };
 
   const branding = company?.branding ?? defaultBranding;
+  const isDark = branding.dark_mode;
 
-  // Use page_leads if any exist, otherwise fall back to all active products
   const displayProducts = pageLeads && pageLeads.length > 0 
     ? pageLeads 
     : allProducts?.map((p) => ({
@@ -36,10 +35,20 @@ export default function BrandedPricing() {
 
   if (companyError) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div 
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: isDark ? '#000000' : '#FFFFFF' }}
+      >
         <div className="text-center">
-          <h1 className="text-xl font-bold mb-2">Company Not Found</h1>
-          <p className="text-sm text-muted-foreground">The pricing page you're looking for doesn't exist.</p>
+          <h1 
+            className="text-xl font-semibold mb-2"
+            style={{ color: isDark ? '#FFFFFF' : '#0A0A0A' }}
+          >
+            Page Not Found
+          </h1>
+          <p style={{ color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
+            The pricing page you're looking for doesn't exist.
+          </p>
         </div>
       </div>
     );
@@ -49,20 +58,16 @@ export default function BrandedPricing() {
     return (
       <div
         className="min-h-screen"
-        style={{
-          background: branding.dark_mode
-            ? '#000000'
-            : 'linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%)',
-        }}
+        style={{ background: isDark ? '#000000' : '#FAFAFA' }}
       >
-        <div className="px-3 py-6 md:px-4 md:py-8 max-w-5xl mx-auto">
-          <div className="text-center mb-6">
-            <Skeleton className="h-10 w-32 mx-auto mb-3 rounded-xl" />
-            <Skeleton className="h-6 w-48 mx-auto rounded-lg" />
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <div className="text-center mb-12">
+            <Skeleton className="h-12 w-32 mx-auto mb-4 rounded-xl" />
+            <Skeleton className="h-6 w-64 mx-auto rounded-lg" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-80 rounded-3xl" />
+              <Skeleton key={i} className="h-[480px] rounded-3xl" />
             ))}
           </div>
         </div>
@@ -72,110 +77,91 @@ export default function BrandedPricing() {
 
   if (!company) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div 
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: isDark ? '#000000' : '#FFFFFF' }}
+      >
         <div className="text-center">
-          <h1 className="text-xl font-bold mb-2">Company Not Found</h1>
-          <p className="text-sm text-muted-foreground">The pricing page you're looking for doesn't exist.</p>
+          <h1 
+            className="text-xl font-semibold mb-2"
+            style={{ color: isDark ? '#FFFFFF' : '#0A0A0A' }}
+          >
+            Page Not Found
+          </h1>
+          <p style={{ color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
+            The pricing page you're looking for doesn't exist.
+          </p>
         </div>
       </div>
     );
   }
 
   const handleOrder = (product: typeof displayProducts[0], quantity: number) => {
-    // TODO: Implement checkout flow
     console.log('Order:', product, 'Quantity:', quantity);
   };
 
   return (
     <div
-      className={`min-h-screen relative overflow-hidden ${branding.dark_mode ? 'animated-gradient-bg-dark' : 'animated-gradient-bg'}`}
+      className="min-h-screen relative"
       style={{
-        fontFamily: branding.font_family || 'inherit',
-        color: branding.dark_mode ? '#FFFFFF' : 'inherit',
+        fontFamily: branding.font_family || 'system-ui, -apple-system, sans-serif',
+        background: isDark 
+          ? 'linear-gradient(180deg, #000000 0%, #0A0A0A 100%)'
+          : 'linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%)',
       }}
     >
-      {/* Floating orbs background - vibrant gradients */}
-      <div 
-        className="floating-orb w-[300px] h-[300px] md:w-[500px] md:h-[500px] top-[-100px] right-[-100px] md:top-[-150px] md:right-[-100px]"
-        style={{ 
-          background: branding.dark_mode 
-            ? 'linear-gradient(135deg, #A855F7 0%, #EC4899 100%)'
-            : `radial-gradient(circle, ${branding.primary_color}60 0%, transparent 70%)`,
-          opacity: branding.dark_mode ? 0.2 : 0.4,
-          animationDelay: '0s',
-        }}
-      />
-      <div 
-        className="floating-orb w-[250px] h-[250px] md:w-[400px] md:h-[400px] bottom-[-50px] left-[-80px] md:bottom-[-100px] md:left-[-100px]"
-        style={{ 
-          background: branding.dark_mode 
-            ? 'linear-gradient(135deg, #6366F1 0%, #D946EF 100%)'
-            : `radial-gradient(circle, ${branding.accent_color}50 0%, transparent 70%)`,
-          opacity: branding.dark_mode ? 0.15 : 0.4,
-          animationDelay: '-7s',
-        }}
-      />
-      <div 
-        className="floating-orb w-[200px] h-[200px] md:w-[300px] md:h-[300px] top-[40%] left-[50%] hidden md:block"
-        style={{ 
-          background: branding.dark_mode 
-            ? 'linear-gradient(135deg, #F59E0B 0%, #EC4899 100%)'
-            : `radial-gradient(circle, ${branding.cta_color}30 0%, transparent 70%)`,
-          opacity: branding.dark_mode ? 0.1 : 0.4,
-          animationDelay: '-14s',
-        }}
-      />
+      {/* Subtle gradient orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div 
+          className="absolute -top-[300px] -right-[200px] w-[600px] h-[600px] rounded-full opacity-[0.15] blur-[120px]"
+          style={{ background: branding.primary_color }}
+        />
+        <div 
+          className="absolute -bottom-[200px] -left-[200px] w-[500px] h-[500px] rounded-full opacity-[0.12] blur-[100px]"
+          style={{ background: branding.accent_color }}
+        />
+      </div>
 
-      {/* Subtle dot pattern overlay */}
+      {/* Grid pattern overlay */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(${branding.dark_mode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)'} 1px, transparent 1px)`,
-          backgroundSize: '24px 24px',
-          opacity: branding.dark_mode ? 1 : 0.3,
+          backgroundImage: isDark 
+            ? 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)'
+            : 'linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px)',
+          backgroundSize: '64px 64px',
         }}
       />
 
-      <div className="relative z-10 px-3 py-5 md:px-4 md:py-8 lg:py-10 max-w-5xl mx-auto">
-        {/* Header - Compact on mobile */}
-        <div className="text-center mb-5 md:mb-8">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 md:py-16 lg:py-20">
+        {/* Header */}
+        <div className="text-center mb-10 md:mb-14">
           {branding.logo_url && (
-            <div className="relative inline-block mb-3 md:mb-4">
-              <div 
-                className="absolute inset-0 blur-2xl opacity-50 rounded-full"
-                style={{ background: branding.primary_color }}
-              />
-              <img
-                src={branding.logo_url}
-                alt={`${company.name} logo`}
-                className="relative h-10 md:h-12 lg:h-14 mx-auto object-contain"
-              />
-            </div>
+            <img
+              src={branding.logo_url}
+              alt={`${company.name} logo`}
+              className="h-10 md:h-12 mx-auto mb-6 object-contain"
+            />
           )}
+          
           <h1
-            className="text-xl md:text-2xl lg:text-3xl font-bold mb-1.5 md:mb-2"
-            style={{
-              background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.accent_color}, ${branding.primary_color})`,
-              backgroundSize: '200% 200%',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              animation: 'gradient-shift 4s ease infinite',
-            }}
+            className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3"
+            style={{ color: isDark ? '#FFFFFF' : '#0A0A0A' }}
           >
             {company.name}
           </h1>
+          
           <p
-            className="text-xs md:text-sm max-w-sm mx-auto"
-            style={{ color: branding.dark_mode ? 'rgba(255, 255, 255, 0.75)' : 'hsl(0 0% 45%)' }}
+            className="text-base md:text-lg max-w-md mx-auto"
+            style={{ color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}
           >
             Choose the perfect lead package for your business
           </p>
         </div>
 
-        {/* Pricing Grid - Mobile first with tighter gaps */}
+        {/* Pricing Grid */}
         {displayProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-5 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 items-stretch">
             {displayProducts.map((pageProduct, index) => (
               <BrandedPricingCard
                 key={pageProduct.id}
@@ -187,34 +173,38 @@ export default function BrandedPricing() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <p 
-              className="text-sm"
-              style={{ color: branding.dark_mode ? 'rgba(255, 255, 255, 0.5)' : 'hsl(0 0% 45%)' }}
-            >
+          <div className="text-center py-16">
+            <p style={{ color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>
               No products available at this time.
             </p>
           </div>
         )}
 
-        {/* Footer - Minimal */}
-        {company.contact_email && (
-          <div className="mt-6 md:mt-10 text-center">
+        {/* Footer */}
+        <div className="mt-12 md:mt-16 text-center">
+          <p
+            className="text-xs"
+            style={{ color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.4)' }}
+          >
+            Secure checkout powered by Stripe • All transactions encrypted
+          </p>
+          
+          {company.contact_email && (
             <p
-              className="text-xs"
-              style={{ color: branding.dark_mode ? 'rgba(255, 255, 255, 0.5)' : 'hsl(0 0% 50%)' }}
+              className="text-xs mt-2"
+              style={{ color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.4)' }}
             >
               Questions?{' '}
               <a
                 href={`mailto:${company.contact_email}`}
+                className="underline transition-colors"
                 style={{ color: branding.primary_color }}
-                className="hover:underline font-medium transition-colors"
               >
                 {company.contact_email}
               </a>
             </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
