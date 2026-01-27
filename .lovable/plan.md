@@ -247,7 +247,7 @@ Should be:
 [!] Security: Enable leaked password protection (user action required in Cloud settings)
 [✗] Stripe integration needed for payments
 [✗] Page leads need assignment (admin action via "Manage Products" dialog)
-[✗] Orders page implementation
+[✓] Orders page implementation (table, filters, details view)
 ```
 
 ---
