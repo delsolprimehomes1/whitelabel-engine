@@ -143,7 +143,7 @@ export default function Dashboard() {
               <div>
                 <p className="font-medium">Share Pricing Pages</p>
                 <p className="text-sm text-muted-foreground">
-                  Each company gets /leads/company-slug
+                  Each company gets /{'{company-slug}'}
                 </p>
               </div>
             </div>
