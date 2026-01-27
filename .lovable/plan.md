@@ -242,10 +242,11 @@ Should be:
 [✓] Branded pages rendering
 [✓] Logo upload working
 [✓] Admin invite system ready
-[✗] Security: Contact info exposure fix needed
-[✗] Security: Enable leaked password protection
+[✓] Security: Contact info exposure fixed (companies_public view created)
+[✓] Dashboard URL reference fixed (/company-slug instead of /leads/company-slug)
+[!] Security: Enable leaked password protection (user action required in Cloud settings)
 [✗] Stripe integration needed for payments
-[✗] Page leads need assignment
+[✗] Page leads need assignment (admin action via "Manage Products" dialog)
 [✗] Orders page implementation
 ```
 
