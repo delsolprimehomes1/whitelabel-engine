@@ -9,11 +9,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Filter, RefreshCw } from 'lucide-react';
-import { useOrders, ORDER_STATUSES } from '@/hooks/useOrders';
+import { ShoppingCart, Filter, RefreshCw, Download } from 'lucide-react';
+import { useOrders, ORDER_STATUSES, OrderWithDetails } from '@/hooks/useOrders';
 import { useCompanies } from '@/hooks/useCompanies';
 import { OrdersTable } from '@/components/admin/OrdersTable';
 import { OrderDetailsDialog } from '@/components/admin/OrderDetailsDialog';
+import { exportToCsv } from '@/lib/exportCsv';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function Orders() {
   const [companyFilter, setCompanyFilter] = useState<string>('all');
@@ -39,6 +42,30 @@ export default function Orders() {
 
   const hasFilters = companyFilter !== 'all' || statusFilter !== 'all';
 
+  const handleExportCsv = () => {
+    if (!orders || orders.length === 0) {
+      toast.error('No orders to export');
+      return;
+    }
+
+    const columns: { key: keyof OrderWithDetails; header: string; format?: (value: unknown) => string }[] = [
+      { key: 'id', header: 'Order ID' },
+      { key: 'created_at', header: 'Date', format: (v) => format(new Date(v as string), 'yyyy-MM-dd HH:mm:ss') },
+      { key: 'customer_name', header: 'Customer Name', format: (v) => (v as string) || '' },
+      { key: 'customer_email', header: 'Customer Email', format: (v) => (v as string) || '' },
+      { key: 'company_name', header: 'Company', format: (v) => (v as string) || '' },
+      { key: 'company_slug', header: 'Company Slug' },
+      { key: 'total_amount', header: 'Amount', format: (v) => (v as number).toFixed(2) },
+      { key: 'status', header: 'Status' },
+      { key: 'stripe_session_id', header: 'Stripe Session', format: (v) => (v as string) || '' },
+      { key: 'domain_source', header: 'Source', format: (v) => (v as string) || 'Direct' },
+    ];
+
+    const filename = `orders-export-${format(new Date(), 'yyyy-MM-dd')}`;
+    exportToCsv(orders, filename, columns);
+    toast.success(`Exported ${orders.length} orders to CSV`);
+  };
+
   return (
     <AdminLayout title="Orders" description="View and manage customer orders">
       <Card>
@@ -53,15 +80,25 @@ export default function Orders() {
                 Track orders and revenue from all pricing pages
               </CardDescription>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              className="w-fit"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCsv}
+                disabled={!orders || orders.length === 0}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
