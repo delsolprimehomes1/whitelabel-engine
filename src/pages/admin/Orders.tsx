@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DateRange } from 'react-day-picker';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -14,6 +15,7 @@ import { useOrders, ORDER_STATUSES, OrderWithDetails } from '@/hooks/useOrders';
 import { useCompanies } from '@/hooks/useCompanies';
 import { OrdersTable } from '@/components/admin/OrdersTable';
 import { OrderDetailsDialog } from '@/components/admin/OrderDetailsDialog';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { exportToCsv } from '@/lib/exportCsv';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -21,6 +23,7 @@ import { toast } from 'sonner';
 export default function Orders() {
   const [companyFilter, setCompanyFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
@@ -28,6 +31,8 @@ export default function Orders() {
   const { data: orders, isLoading, refetch } = useOrders({
     companyId: companyFilter !== 'all' ? companyFilter : undefined,
     status: statusFilter !== 'all' ? statusFilter : undefined,
+    dateFrom: dateRange?.from,
+    dateTo: dateRange?.to,
   });
 
   const handleViewOrder = (orderId: string) => {
@@ -38,9 +43,10 @@ export default function Orders() {
   const handleClearFilters = () => {
     setCompanyFilter('all');
     setStatusFilter('all');
+    setDateRange(undefined);
   };
 
-  const hasFilters = companyFilter !== 'all' || statusFilter !== 'all';
+  const hasFilters = companyFilter !== 'all' || statusFilter !== 'all' || dateRange !== undefined;
 
   const handleExportCsv = () => {
     if (!orders || orders.length === 0) {
@@ -103,53 +109,60 @@ export default function Orders() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Filter className="h-4 w-4" />
-              <span>Filters:</span>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Filter className="h-4 w-4" />
+                <span>Filters:</span>
+              </div>
+
+              <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                <SelectTrigger className="w-[180px] bg-background">
+                  <SelectValue placeholder="All Companies" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border-border">
+                  <SelectItem value="all">All Companies</SelectItem>
+                  {companies.map((company) => (
+                    <SelectItem key={company.id} value={company.id}>
+                      {company.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[150px] bg-background">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border-border">
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  {ORDER_STATUSES.map((status) => (
+                    <SelectItem key={status.value} value={status.value}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <DateRangePicker
+                dateRange={dateRange}
+                onDateRangeChange={setDateRange}
+              />
+
+              {hasFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearFilters}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Clear all
+                </Button>
+              )}
             </div>
 
-            <Select value={companyFilter} onValueChange={setCompanyFilter}>
-              <SelectTrigger className="w-[180px] bg-background">
-                <SelectValue placeholder="All Companies" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-border">
-                <SelectItem value="all">All Companies</SelectItem>
-                {companies.map((company) => (
-                  <SelectItem key={company.id} value={company.id}>
-                    {company.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px] bg-background">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-border">
-                <SelectItem value="all">All Statuses</SelectItem>
-                {ORDER_STATUSES.map((status) => (
-                  <SelectItem key={status.value} value={status.value}>
-                    {status.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {hasFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearFilters}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Clear filters
-              </Button>
-            )}
-
-            <div className="ml-auto text-sm text-muted-foreground">
-              {orders?.length ?? 0} order{(orders?.length ?? 0) !== 1 ? 's' : ''}
+            <div className="text-sm text-muted-foreground">
+              {orders?.length ?? 0} order{(orders?.length ?? 0) !== 1 ? 's' : ''} found
             </div>
           </div>
 
