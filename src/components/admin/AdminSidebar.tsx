@@ -22,10 +22,12 @@ import {
   Settings,
   LogOut,
   Shield,
+  BarChart3,
 } from 'lucide-react';
 
 const menuItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
+  { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
   { title: 'Companies & Pages', url: '/admin/companies', icon: Building2 },
   { title: 'Lead Products', url: '/admin/products', icon: Package },
   { title: 'Orders', url: '/admin/orders', icon: ShoppingCart },
