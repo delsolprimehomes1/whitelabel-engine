@@ -44,7 +44,12 @@ export const ORDER_STATUSES: { value: OrderStatus; label: string; color: string 
   { value: 'refunded', label: 'Refunded', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
 ];
 
-export function useOrders(filters?: { companyId?: string; status?: string }) {
+export function useOrders(filters?: { 
+  companyId?: string; 
+  status?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+}) {
   const queryClient = useQueryClient();
 
   // Subscribe to real-time updates
@@ -91,6 +96,17 @@ export function useOrders(filters?: { companyId?: string; status?: string }) {
 
       if (filters?.status) {
         query = query.eq('status', filters.status);
+      }
+
+      if (filters?.dateFrom) {
+        query = query.gte('created_at', filters.dateFrom.toISOString());
+      }
+
+      if (filters?.dateTo) {
+        // Add one day to include the entire end date
+        const endDate = new Date(filters.dateTo);
+        endDate.setDate(endDate.getDate() + 1);
+        query = query.lt('created_at', endDate.toISOString());
       }
 
       const { data: orders, error } = await query;
