@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { startOfMonth, subMonths, format, eachDayOfInterval, subDays } from 'date-fns';
+import { format, eachDayOfInterval, subDays, differenceInDays } from 'date-fns';
 
 interface DailyStats {
   date: string;
@@ -16,6 +16,13 @@ interface CompanyStats {
   total_orders: number;
 }
 
+interface PeriodComparison {
+  current: number;
+  previous: number;
+  change: number;
+  changePercent: number;
+}
+
 interface AnalyticsData {
   dailyStats: DailyStats[];
   topCompanies: CompanyStats[];
@@ -24,6 +31,17 @@ interface AnalyticsData {
     totalOrders: number;
     avgOrderValue: number;
   };
+  comparison: {
+    revenue: PeriodComparison;
+    orders: PeriodComparison;
+    avgOrderValue: PeriodComparison;
+  };
+}
+
+function calculateComparison(current: number, previous: number): PeriodComparison {
+  const change = current - previous;
+  const changePercent = previous > 0 ? ((current - previous) / previous) * 100 : current > 0 ? 100 : 0;
+  return { current, previous, change, changePercent };
 }
 
 export function useAnalytics(dateRange?: { from?: Date; to?: Date }) {
@@ -33,19 +51,40 @@ export function useAnalytics(dateRange?: { from?: Date; to?: Date }) {
       // Default to last 30 days if no range provided
       const endDate = dateRange?.to || new Date();
       const startDate = dateRange?.from || subDays(endDate, 30);
+      
+      // Calculate the previous period of the same length
+      const periodLength = differenceInDays(endDate, startDate) + 1;
+      const previousEndDate = subDays(startDate, 1);
+      const previousStartDate = subDays(previousEndDate, periodLength - 1);
 
-      // Fetch orders within date range
-      const { data: orders, error: ordersError } = await supabase
-        .from('orders')
-        .select('id, total_amount, created_at, company_id, company_slug')
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString())
-        .order('created_at', { ascending: true });
+      // Fetch orders for current and previous periods in parallel
+      const [currentOrdersRes, previousOrdersRes] = await Promise.all([
+        supabase
+          .from('orders')
+          .select('id, total_amount, created_at, company_id, company_slug')
+          .gte('created_at', startDate.toISOString())
+          .lte('created_at', endDate.toISOString())
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('orders')
+          .select('id, total_amount, created_at')
+          .gte('created_at', previousStartDate.toISOString())
+          .lte('created_at', previousEndDate.toISOString()),
+      ]);
 
-      if (ordersError) throw ordersError;
+      if (currentOrdersRes.error) throw currentOrdersRes.error;
+      if (previousOrdersRes.error) throw previousOrdersRes.error;
+
+      const orders = currentOrdersRes.data || [];
+      const previousOrders = previousOrdersRes.data || [];
+
+      // Calculate previous period totals
+      const prevTotalRevenue = previousOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+      const prevTotalOrders = previousOrders.length;
+      const prevAvgOrderValue = prevTotalOrders > 0 ? prevTotalRevenue / prevTotalOrders : 0;
 
       // Fetch company names
-      const companyIds = [...new Set(orders?.map(o => o.company_id).filter(Boolean))];
+      const companyIds = [...new Set(orders.map(o => o.company_id).filter(Boolean))];
       let companyMap: Record<string, string> = {};
       
       if (companyIds.length > 0) {
@@ -67,7 +106,7 @@ export function useAnalytics(dateRange?: { from?: Date; to?: Date }) {
       });
 
       // Aggregate order data by day
-      orders?.forEach(order => {
+      orders.forEach(order => {
         const day = format(new Date(order.created_at), 'yyyy-MM-dd');
         if (dailyMap[day]) {
           dailyMap[day].revenue += order.total_amount || 0;
@@ -83,7 +122,7 @@ export function useAnalytics(dateRange?: { from?: Date; to?: Date }) {
       // Calculate company stats
       const companyStatsMap: Record<string, CompanyStats> = {};
       
-      orders?.forEach(order => {
+      orders.forEach(order => {
         const key = order.company_id || order.company_slug;
         if (!companyStatsMap[key]) {
           companyStatsMap[key] = {
@@ -102,9 +141,10 @@ export function useAnalytics(dateRange?: { from?: Date; to?: Date }) {
         .sort((a, b) => b.total_revenue - a.total_revenue)
         .slice(0, 5);
 
-      // Calculate totals
-      const totalRevenue = orders?.reduce((sum, o) => sum + (o.total_amount || 0), 0) || 0;
-      const totalOrders = orders?.length || 0;
+      // Calculate current totals
+      const totalRevenue = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+      const totalOrders = orders.length;
+      const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
       return {
         dailyStats,
@@ -112,7 +152,12 @@ export function useAnalytics(dateRange?: { from?: Date; to?: Date }) {
         totals: {
           totalRevenue,
           totalOrders,
-          avgOrderValue: totalOrders > 0 ? totalRevenue / totalOrders : 0,
+          avgOrderValue,
+        },
+        comparison: {
+          revenue: calculateComparison(totalRevenue, prevTotalRevenue),
+          orders: calculateComparison(totalOrders, prevTotalOrders),
+          avgOrderValue: calculateComparison(avgOrderValue, prevAvgOrderValue),
         },
       };
     },

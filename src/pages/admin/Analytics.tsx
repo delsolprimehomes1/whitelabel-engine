@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { DollarSign, ShoppingCart, TrendingUp, Building2 } from 'lucide-react';
+import { DollarSign, ShoppingCart, TrendingUp, TrendingDown, Building2, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
+import { cn } from '@/lib/utils';
 import {
   ChartContainer,
   ChartTooltip,
@@ -20,7 +21,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  ResponsiveContainer,
 } from 'recharts';
 
 const revenueChartConfig = {
@@ -43,6 +43,40 @@ const companiesChartConfig = {
     color: 'hsl(var(--primary))',
   },
 };
+
+interface GrowthIndicatorProps {
+  value: number;
+  showIcon?: boolean;
+}
+
+function GrowthIndicator({ value, showIcon = true }: GrowthIndicatorProps) {
+  const isPositive = value > 0;
+  const isNegative = value < 0;
+  const isNeutral = value === 0;
+
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-1 text-xs font-medium',
+        isPositive && 'text-green-500',
+        isNegative && 'text-red-500',
+        isNeutral && 'text-muted-foreground'
+      )}
+    >
+      {showIcon && (
+        <>
+          {isPositive && <ArrowUp className="h-3 w-3" />}
+          {isNegative && <ArrowDown className="h-3 w-3" />}
+          {isNeutral && <Minus className="h-3 w-3" />}
+        </>
+      )}
+      <span>
+        {isPositive && '+'}
+        {value.toFixed(1)}%
+      </span>
+    </div>
+  );
+}
 
 export default function Analytics() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
@@ -75,7 +109,7 @@ export default function Analytics() {
           />
         </div>
 
-        {/* Summary Cards */}
+        {/* Summary Cards with Comparison */}
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -86,11 +120,16 @@ export default function Analytics() {
               {isLoading ? (
                 <Skeleton className="h-8 w-24" />
               ) : (
-                <div className="text-2xl font-bold">
-                  {formatCurrency(analytics?.totals.totalRevenue || 0)}
-                </div>
+                <>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(analytics?.totals.totalRevenue || 0)}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <GrowthIndicator value={analytics?.comparison.revenue.changePercent || 0} />
+                    <span className="text-xs text-muted-foreground">vs previous period</span>
+                  </div>
+                </>
               )}
-              <p className="text-xs text-muted-foreground">In selected period</p>
             </CardContent>
           </Card>
 
@@ -103,31 +142,111 @@ export default function Analytics() {
               {isLoading ? (
                 <Skeleton className="h-8 w-24" />
               ) : (
-                <div className="text-2xl font-bold">
-                  {analytics?.totals.totalOrders || 0}
-                </div>
+                <>
+                  <div className="text-2xl font-bold">
+                    {analytics?.totals.totalOrders || 0}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <GrowthIndicator value={analytics?.comparison.orders.changePercent || 0} />
+                    <span className="text-xs text-muted-foreground">vs previous period</span>
+                  </div>
+                </>
               )}
-              <p className="text-xs text-muted-foreground">In selected period</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Avg Order Value</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              {(analytics?.comparison.avgOrderValue.changePercent || 0) >= 0 ? (
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <TrendingDown className="h-4 w-4 text-muted-foreground" />
+              )}
             </CardHeader>
             <CardContent>
               {isLoading ? (
                 <Skeleton className="h-8 w-24" />
               ) : (
-                <div className="text-2xl font-bold">
-                  {formatCurrency(analytics?.totals.avgOrderValue || 0)}
-                </div>
+                <>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(analytics?.totals.avgOrderValue || 0)}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <GrowthIndicator value={analytics?.comparison.avgOrderValue.changePercent || 0} />
+                    <span className="text-xs text-muted-foreground">vs previous period</span>
+                  </div>
+                </>
               )}
-              <p className="text-xs text-muted-foreground">Per order average</p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Period Comparison Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Period Comparison</CardTitle>
+            <CardDescription>Current period vs previous period of the same length</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-24 w-full" />
+            ) : (
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Revenue Change</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className={cn(
+                      "text-xl font-bold",
+                      (analytics?.comparison.revenue.change || 0) >= 0 ? "text-green-500" : "text-red-500"
+                    )}>
+                      {(analytics?.comparison.revenue.change || 0) >= 0 ? '+' : ''}
+                      {formatCurrency(analytics?.comparison.revenue.change || 0)}
+                    </span>
+                    <GrowthIndicator value={analytics?.comparison.revenue.changePercent || 0} />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Previous: {formatCurrency(analytics?.comparison.revenue.previous || 0)}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Orders Change</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className={cn(
+                      "text-xl font-bold",
+                      (analytics?.comparison.orders.change || 0) >= 0 ? "text-green-500" : "text-red-500"
+                    )}>
+                      {(analytics?.comparison.orders.change || 0) >= 0 ? '+' : ''}
+                      {analytics?.comparison.orders.change || 0}
+                    </span>
+                    <GrowthIndicator value={analytics?.comparison.orders.changePercent || 0} />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Previous: {analytics?.comparison.orders.previous || 0} orders
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">AOV Change</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className={cn(
+                      "text-xl font-bold",
+                      (analytics?.comparison.avgOrderValue.change || 0) >= 0 ? "text-green-500" : "text-red-500"
+                    )}>
+                      {(analytics?.comparison.avgOrderValue.change || 0) >= 0 ? '+' : ''}
+                      {formatCurrency(analytics?.comparison.avgOrderValue.change || 0)}
+                    </span>
+                    <GrowthIndicator value={analytics?.comparison.avgOrderValue.changePercent || 0} />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Previous: {formatCurrency(analytics?.comparison.avgOrderValue.previous || 0)}
+                  </p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Revenue Trend Chart */}
         <Card>
