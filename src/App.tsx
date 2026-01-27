@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Pricing from "./pages/Pricing";
 import BrandedPricing from "./pages/BrandedPricing";
 import Dashboard from "./pages/admin/Dashboard";
+import Analytics from "./pages/admin/Analytics";
 import Companies from "./pages/admin/Companies";
 import Products from "./pages/admin/Products";
 import Orders from "./pages/admin/Orders";
@@ -37,6 +38,14 @@ const App = () => (
               element={
                 <ProtectedRoute requireAdmin>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/analytics"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Analytics />
                 </ProtectedRoute>
               }
             />
