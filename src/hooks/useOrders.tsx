@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -44,6 +45,38 @@ export const ORDER_STATUSES: { value: OrderStatus; label: string; color: string 
 ];
 
 export function useOrders(filters?: { companyId?: string; status?: string }) {
+  const queryClient = useQueryClient();
+
+  // Subscribe to real-time updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('orders-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders',
+        },
+        (payload) => {
+          // Invalidate queries to refetch with updated data
+          queryClient.invalidateQueries({ queryKey: ['orders'] });
+          
+          // Show toast for new orders
+          if (payload.eventType === 'INSERT') {
+            toast.success('New order received!', {
+              description: `Order #${(payload.new as Order).id.slice(0, 8)}...`,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   return useQuery({
     queryKey: ['orders', filters],
     queryFn: async (): Promise<OrderWithDetails[]> => {
