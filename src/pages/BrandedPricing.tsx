@@ -3,6 +3,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useCompanyBySlug, usePageLeads } from '@/hooks/useCompanyPage';
 import { BrandedPricingCard } from '@/components/branded/BrandedPricingCard';
 import { useActiveLeadProducts } from '@/hooks/useLeadProducts';
+import { WhyChooseSection } from '@/components/branded/WhyChooseSection';
+import { HowItWorksSection } from '@/components/branded/HowItWorksSection';
+import { WhatMakesSpecialSection } from '@/components/branded/WhatMakesSpecialSection';
 
 export default function BrandedPricing() {
   const { slug } = useParams<{ slug: string }>();
@@ -179,6 +182,11 @@ export default function BrandedPricing() {
             </p>
           </div>
         )}
+
+        {/* New content sections */}
+        <WhatMakesSpecialSection companyName={company.name} branding={branding} />
+        <WhyChooseSection companyName={company.name} branding={branding} />
+        <HowItWorksSection branding={branding} />
 
         {/* Footer */}
         <div className="mt-12 md:mt-16 text-center">
