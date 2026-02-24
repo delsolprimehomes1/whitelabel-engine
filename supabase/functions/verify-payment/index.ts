@@ -31,11 +31,14 @@ serve(async (req) => {
       const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent_id);
 
       if (paymentIntent.status === "succeeded") {
+        // Backfill customer details from Stripe if missing
+        const stripeEmail = paymentIntent.receipt_email || paymentIntent.latest_charge?.billing_details?.email || null;
+        const updatePayload: Record<string, unknown> = { status: "completed" };
+        if (stripeEmail) updatePayload.customer_email = stripeEmail;
+
         const { data: order, error: updateError } = await supabaseAdmin
           .from("orders")
-          .update({
-            status: "completed",
-          })
+          .update(updatePayload)
           .eq("stripe_payment_intent_id", payment_intent_id)
           .select("*, order_items(*)")
           .single();
