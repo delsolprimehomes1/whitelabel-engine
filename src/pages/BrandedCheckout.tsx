@@ -297,8 +297,8 @@ export default function BrandedCheckout() {
             price_per_lead: orderDetails!.price_per_lead,
             quantity: orderDetails!.quantity,
             page_path: `/${company!.slug}`,
-            customer_email: '', // Will be filled in the form
-            customer_name: '',
+            customer_email: null,
+            customer_name: null,
           },
         });
 

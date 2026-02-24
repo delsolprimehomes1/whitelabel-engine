@@ -14,6 +14,7 @@ serve(async (req) => {
   }
 
   try {
+    const body = await req.json();
     const {
       company_id,
       company_slug,
@@ -23,9 +24,14 @@ serve(async (req) => {
       price_per_lead,
       quantity,
       page_path,
-      customer_email,
-      customer_name,
-    } = await req.json();
+    } = body;
+
+    const rawEmail = typeof body.customer_email === 'string' ? body.customer_email.trim() : '';
+    const rawName = typeof body.customer_name === 'string' ? body.customer_name.trim() : '';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const hasValidEmail = rawEmail.length > 0 && emailRegex.test(rawEmail);
+    const normalizedEmail = hasValidEmail ? rawEmail : null;
+    const normalizedName = rawName.length > 0 ? rawName : null;
 
     if (!company_slug || !lead_name || !price_per_lead || !quantity) {
       throw new Error("Missing required fields");
@@ -42,11 +48,11 @@ serve(async (req) => {
 
     const totalAmount = Math.round(price_per_lead * quantity * 100); // cents
 
-    // Create PaymentIntent
+    // Create PaymentIntent (only include receipt_email if valid)
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalAmount,
       currency: "usd",
-      receipt_email: customer_email,
+      ...(hasValidEmail ? { receipt_email: normalizedEmail } : {}),
       metadata: {
         company_id: company_id || "",
         company_slug,
@@ -72,8 +78,8 @@ serve(async (req) => {
         stripe_payment_intent_id: paymentIntent.id,
         page_path: page_path || null,
         domain_source: req.headers.get("origin") || null,
-        customer_email,
-        customer_name: customer_name || null,
+        customer_email: normalizedEmail,
+        customer_name: normalizedName,
       })
       .select()
       .single();
