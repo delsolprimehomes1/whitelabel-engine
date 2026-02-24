@@ -27,7 +27,7 @@ serve(async (req) => {
       customer_name,
     } = await req.json();
 
-    if (!company_slug || !lead_name || !price_per_lead || !quantity || !customer_email) {
+    if (!company_slug || !lead_name || !price_per_lead || !quantity) {
       throw new Error("Missing required fields");
     }
 
