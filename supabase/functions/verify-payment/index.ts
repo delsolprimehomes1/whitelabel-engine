@@ -14,8 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    const { session_id } = await req.json();
-    if (!session_id) throw new Error("Missing session_id");
+    const { session_id, payment_intent_id } = await req.json();
+    if (!session_id && !payment_intent_id) throw new Error("Missing session_id or payment_intent_id");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -26,11 +26,58 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Retrieve the checkout session
+    // Handle PaymentIntent-based verification (custom checkout)
+    if (payment_intent_id) {
+      const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent_id);
+
+      if (paymentIntent.status === "succeeded") {
+        const { data: order, error: updateError } = await supabaseAdmin
+          .from("orders")
+          .update({
+            status: "completed",
+          })
+          .eq("stripe_payment_intent_id", payment_intent_id)
+          .select("*, order_items(*)")
+          .single();
+
+        if (updateError) {
+          console.error("Order update error:", updateError);
+          throw new Error("Failed to update order");
+        }
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            order: {
+              id: order.id,
+              status: order.status,
+              total_amount: order.total_amount,
+              customer_email: order.customer_email,
+              customer_name: order.customer_name,
+              company_slug: order.company_slug,
+              items: order.order_items,
+            },
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ success: false, status: paymentIntent.status }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
+    }
+
+    // Handle Checkout Session-based verification (legacy)
     const session = await stripe.checkout.sessions.retrieve(session_id);
 
     if (session.payment_status === "paid") {
-      // Update order status
       const { data: order, error: updateError } = await supabaseAdmin
         .from("orders")
         .update({
