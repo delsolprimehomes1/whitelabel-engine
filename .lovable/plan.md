@@ -1,109 +1,86 @@
 
 
-## Add Stripe Checkout to Branded Pricing Cards
+## Custom Branded Checkout Page
 
-### What We're Building
+### Problem
+The current flow redirects customers to Stripe's hosted checkout page, which shows Stripe/LifeCo branding instead of the white-label company's branding. This breaks the white-label experience.
 
-When a customer clicks "Order Now" on any lead product card on a white-label pricing page (`/:slug`), they'll be redirected to a Stripe Checkout session. After payment, they land on a branded success page. An order record is created in the database for admin tracking.
+### Solution
+Replace the Stripe Checkout redirect with a custom in-app checkout page that collects customer info and card details using Stripe Elements, fully styled to match each company's branding.
 
-This is a **guest checkout** flow — customers don't need to log in. They enter their email on Stripe's hosted checkout page.
+### Architecture Change
 
----
+```text
+CURRENT FLOW:
+  Click "Order Now" → Edge function creates Checkout Session → Redirect to stripe.com → Return to /slug/success
+
+NEW FLOW:
+  Click "Order Now" → Navigate to /:slug/checkout (in-app, branded) → Customer fills email + card
+  → Edge function creates PaymentIntent → Stripe.js confirms payment client-side → Navigate to /:slug/success
+```
 
 ### Technical Plan
 
-#### 1. Backend Function: `create-checkout`
+#### 1. Add Stripe.js dependency
+- Install `@stripe/stripe-js` and `@stripe/react-stripe-js` packages
+- These provide the `Elements` provider and `CardElement` / `PaymentElement` components that render secure, PCI-compliant card input fields inside our branded page
 
-A new edge function at `supabase/functions/create-checkout/index.ts` that:
+#### 2. New Edge Function: `create-payment-intent`
+**File:** `supabase/functions/create-payment-intent/index.ts`
 
-- Accepts: `company_id`, `company_slug`, `company_name`, `lead_product_id`, `lead_name`, `price_per_lead`, `quantity`, `page_path`
-- Creates a Stripe Checkout session in `mode: "payment"` with:
-  - Dynamic `line_items` using `price_data` (since lead products are in our DB, not Stripe products) with the product name, unit price, and quantity
-  - Metadata: `company_id`, `company_slug`, `company_name`, `lead_type`, `lead_product_id`, `quantity`, `page_path`, `domain_source`, `timestamp`
-  - `success_url` pointing to `/{slug}/success?session_id={CHECKOUT_SESSION_ID}`
-  - `cancel_url` pointing back to `/{slug}`
-- Creates a pending order in the `orders` table with a matching `order_items` row
-- Stores the `stripe_session_id` on the order
-- Returns the Stripe checkout URL
+Replaces the current `create-checkout` function's role for the branded flow:
+- Accepts: `company_id`, `company_slug`, `company_name`, `lead_product_id`, `lead_name`, `price_per_lead`, `quantity`, `page_path`, `customer_email`, `customer_name`
+- Creates a Stripe PaymentIntent with `amount` in cents and metadata
+- Creates a pending order in the `orders` table with matching `order_items`
+- Returns `client_secret` (needed by Stripe.js to confirm payment on the frontend)
 
-Config update in `supabase/config.toml`:
-```toml
-[functions.create-checkout]
-verify_jwt = false
-```
+Config: `verify_jwt = false` (guest checkout)
 
-#### 2. Backend Function: `verify-payment`
+#### 3. Update Edge Function: `verify-payment`
+- Add support for looking up orders by `stripe_payment_intent_id` (in addition to existing `stripe_session_id` lookup)
+- The custom checkout confirms payment client-side, so we verify via PaymentIntent ID
 
-A new edge function at `supabase/functions/verify-payment/index.ts` that:
+#### 4. New Page: `/:slug/checkout`
+**File:** `src/pages/BrandedCheckout.tsx`
 
-- Accepts: `session_id`
-- Retrieves the Stripe Checkout session
-- If payment succeeded, updates the order status from `pending` to `completed` and stores the `stripe_payment_intent_id`
-- Returns the order details for the success page
+A fully branded checkout page that:
+- Receives order details via URL state/params (product name, quantity, price, company slug)
+- Displays an order summary panel (matching the company's branding/colors/dark mode)
+- Collects customer name and email in styled input fields
+- Renders Stripe `PaymentElement` for card details (styled to match dark/light mode)
+- On submit: calls `create-payment-intent` → uses `stripe.confirmPayment()` → redirects to `/:slug/success`
+- Shows loading states and error handling
+- Uses the Stripe publishable key (needs to be stored in the codebase as `VITE_STRIPE_PUBLISHABLE_KEY` since it's a public key)
 
-Config update:
-```toml
-[functions.verify-payment]
-verify_jwt = false
-```
+#### 5. Update `BrandedPricing.tsx`
+- Change `handleOrder` to navigate to `/:slug/checkout` with order details in route state instead of calling the edge function directly
 
-#### 3. Frontend: Wire Up the Buy Button
+#### 6. Update `src/App.tsx`
+- Add route: `/:slug/checkout` → `BrandedCheckout`
+- Place before the `/:slug` catch-all
 
-**Modify `src/components/branded/BrandedPricingCard.tsx`:**
-- The `onOrder` callback already exists and is wired to the CTA button
-- No changes needed in this file
-
-**Modify `src/pages/BrandedPricing.tsx`:**
-- Update `handleOrder` to call `supabase.functions.invoke('create-checkout')` with all required metadata
-- On success, redirect to the Stripe checkout URL via `window.location.href`
-- Show a loading/spinner state on the button while the checkout session is being created
-
-#### 4. Success Page
-
-**Create `src/pages/CheckoutSuccess.tsx`:**
-- Reads `session_id` from URL query params
-- Calls `supabase.functions.invoke('verify-payment')` to confirm payment and update order status
-- Shows a branded confirmation with:
-  - Company logo and name (fetched via slug)
-  - "Payment Successful" message
-  - Order summary (lead type, quantity, total)
-  - Company contact email link
-- Styled to match the branded page theme (dark/light mode, company colors)
-
-**Update `src/App.tsx`:**
-- Add route: `/:slug/success` → `CheckoutSuccess`
-- Place it before the `/:slug` catch-all route
-
-#### 5. Database
-
-No schema changes needed. The existing `orders` and `order_items` tables already have all required columns (`stripe_session_id`, `stripe_payment_intent_id`, `company_id`, `company_slug`, `status`, etc.).
-
-RLS: The edge functions use the service role key (`SUPABASE_SERVICE_ROLE_KEY` already configured) to insert/update orders, so no new RLS policies are needed for the public checkout flow.
-
----
-
-### Flow Summary
-
-```text
-Customer clicks "Order Now"
-  → Frontend calls create-checkout edge function
-  → Edge function creates Stripe session + pending order
-  → Customer redirected to Stripe Checkout
-  → Customer pays
-  → Stripe redirects to /{slug}/success?session_id=...
-  → Success page calls verify-payment edge function
-  → Order status updated to "completed"
-  → Customer sees confirmation
-  → Admin sees new order in dashboard (real-time)
-```
+#### 7. Stripe Publishable Key
+- Your publishable key (`pk_live_...` or `pk_test_...`) is safe to store in code
+- Will be added as a `VITE_STRIPE_PUBLISHABLE_KEY` environment variable or constant
 
 ### Files to Create
-- `supabase/functions/create-checkout/index.ts`
-- `supabase/functions/verify-payment/index.ts`
-- `src/pages/CheckoutSuccess.tsx`
+- `supabase/functions/create-payment-intent/index.ts`
+- `src/pages/BrandedCheckout.tsx`
 
 ### Files to Modify
-- `supabase/config.toml` — add function configs
-- `src/pages/BrandedPricing.tsx` — update `handleOrder`
-- `src/App.tsx` — add success route
+- `src/App.tsx` — add checkout route
+- `src/pages/BrandedPricing.tsx` — navigate to checkout instead of redirect
+- `supabase/functions/verify-payment/index.ts` — support PaymentIntent lookup
+
+### What the Customer Sees
+1. Branded pricing page → clicks "Order Now"
+2. Branded checkout page with company logo, colors, dark/light mode
+3. Enters name, email, card details (all on your domain)
+4. Clicks "Pay $X.XX" → payment processes
+5. Branded success page with order confirmation
+
+No Stripe branding visible at any point.
+
+### Requirement From You
+I'll need your **Stripe publishable key** (`pk_test_...` or `pk_live_...`) to initialize Stripe.js on the frontend. This is a public key and safe to include in the code.
 
