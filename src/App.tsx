@@ -17,6 +17,7 @@ import Products from "./pages/admin/Products";
 import Orders from "./pages/admin/Orders";
 import ActivityLog from "./pages/admin/ActivityLog";
 import Settings from "./pages/admin/Settings";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -89,6 +90,9 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            
+            {/* Success page - MUST be before /:slug */}
+            <Route path="/:slug/success" element={<CheckoutSuccess />} />
             
             {/* Dynamic company slug route - MUST be after all fixed routes */}
             <Route path="/:slug" element={<BrandedPricing />} />

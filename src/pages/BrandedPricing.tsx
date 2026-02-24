@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCompanyBySlug, usePageLeads } from '@/hooks/useCompanyPage';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { BrandedPricingCard } from '@/components/branded/BrandedPricingCard';
 import { useActiveLeadProducts } from '@/hooks/useLeadProducts';
 import { WhyChooseSection } from '@/components/branded/WhyChooseSection';
@@ -12,6 +15,7 @@ export default function BrandedPricing() {
   const { data: company, isLoading: companyLoading, error: companyError } = useCompanyBySlug(slug);
   const { data: pageLeads, isLoading: leadsLoading } = usePageLeads(company?.id);
   const { data: allProducts } = useActiveLeadProducts();
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   const isLoading = companyLoading || leadsLoading;
 
@@ -99,8 +103,37 @@ export default function BrandedPricing() {
     );
   }
 
-  const handleOrder = (product: typeof displayProducts[0], quantity: number) => {
-    console.log('Order:', product, 'Quantity:', quantity);
+  
+
+  const handleOrder = async (product: typeof displayProducts[0], quantity: number) => {
+    setCheckoutLoading(product.id);
+    try {
+      const pricePerLead = product.custom_price ?? product.lead_product.base_price;
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          company_id: company.id,
+          company_slug: company.slug,
+          company_name: company.name,
+          lead_product_id: product.lead_product.id,
+          lead_name: product.lead_product.name,
+          price_per_lead: pricePerLead,
+          quantity,
+          page_path: `/${company.slug}`,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (e: any) {
+      console.error('Checkout error:', e);
+      toast.error('Failed to start checkout. Please try again.');
+    } finally {
+      setCheckoutLoading(null);
+    }
   };
 
   return (
