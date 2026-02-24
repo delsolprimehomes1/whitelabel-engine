@@ -16,6 +16,7 @@ export default function CheckoutSuccess() {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
+  const paymentIntentId = searchParams.get('payment_intent');
   const { data: company } = useCompanyBySlug(slug);
 
   const [order, setOrder] = useState<OrderData | null>(null);
@@ -33,16 +34,17 @@ export default function CheckoutSuccess() {
   const isDark = branding.dark_mode;
 
   useEffect(() => {
-    if (!sessionId) {
+    if (!sessionId && !paymentIntentId) {
       setStatus('error');
       return;
     }
 
     const verify = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('verify-payment', {
-          body: { session_id: sessionId },
-        });
+        const body = paymentIntentId
+          ? { payment_intent_id: paymentIntentId }
+          : { session_id: sessionId };
+        const { data, error } = await supabase.functions.invoke('verify-payment', { body });
         if (error) throw error;
         if (data?.success) {
           setOrder(data.order);
@@ -57,7 +59,7 @@ export default function CheckoutSuccess() {
     };
 
     verify();
-  }, [sessionId]);
+  }, [sessionId, paymentIntentId]);
 
   return (
     <div

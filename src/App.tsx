@@ -18,6 +18,7 @@ import Orders from "./pages/admin/Orders";
 import ActivityLog from "./pages/admin/ActivityLog";
 import Settings from "./pages/admin/Settings";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import BrandedCheckout from "./pages/BrandedCheckout";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -91,7 +92,8 @@ const App = () => (
               }
             />
             
-            {/* Success page - MUST be before /:slug */}
+            {/* Checkout + Success pages - MUST be before /:slug */}
+            <Route path="/:slug/checkout" element={<BrandedCheckout />} />
             <Route path="/:slug/success" element={<CheckoutSuccess />} />
             
             {/* Dynamic company slug route - MUST be after all fixed routes */}
