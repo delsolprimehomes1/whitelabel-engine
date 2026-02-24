@@ -1,58 +1,109 @@
 
-## Add "Why Choose" & "How It Works" Sections to White-Label Pricing Pages
 
-### What's Being Added
+## Add Stripe Checkout to Branded Pricing Cards
 
-The branded pricing page (`/leads/{slug}`) currently only shows a header and pricing cards. We'll enrich it with three new content sections below the pricing grid, all dynamically branded and using the company name:
+### What We're Building
 
-1. **"Why Choose [Company Name] Leads"** — A feature grid with 6 benefit cards (Pre-Qualified Leads, Exclusive Leads, Real-Time Delivery, High Conversion Rate, Performance Tracking, CRM Integration), matching the reference screenshot style.
+When a customer clicks "Order Now" on any lead product card on a white-label pricing page (`/:slug`), they'll be redirected to a Stripe Checkout session. After payment, they land on a branded success page. An order record is created in the database for admin tracking.
 
-2. **"How It Works"** — A numbered 5-step horizontal process (Select Lead Type → Define Territory → Setup CRM → Receive Leads → Connect & Convert), matching the reference screenshot style.
-
-3. **"What Makes [Company Name] Special?"** — A compact highlight section with two feature cards (Fresh Leads + Aged Leads) and a quality assurance badge pill, matching the first reference screenshot.
-
-All sections adapt to the company's `primary_color`, `accent_color`, and `dark_mode` settings dynamically. No database changes are needed.
+This is a **guest checkout** flow — customers don't need to log in. They enter their email on Stripe's hosted checkout page.
 
 ---
 
 ### Technical Plan
 
-**File to modify: `src/pages/BrandedPricing.tsx`**
+#### 1. Backend Function: `create-checkout`
 
-Add three new inline section components before the footer. All content is static but branded:
+A new edge function at `supabase/functions/create-checkout/index.ts` that:
 
-**Section 1 — "Why Choose [Company Name] Leads"**
-- Gradient heading: first part uses `primary_color`, "Leads" word uses `accent_color`
-- Subtitle paragraph
-- 6-card grid (`CheckCircle`, `Shield`, `Clock`, `Zap`, `BarChart2`, `Users` icons from lucide-react)
-- Each card: semi-transparent glassmorphism background, icon in a soft pill, title + description
-- Responsive: 1 col mobile → 2 col tablet → 3 col desktop
+- Accepts: `company_id`, `company_slug`, `company_name`, `lead_product_id`, `lead_name`, `price_per_lead`, `quantity`, `page_path`
+- Creates a Stripe Checkout session in `mode: "payment"` with:
+  - Dynamic `line_items` using `price_data` (since lead products are in our DB, not Stripe products) with the product name, unit price, and quantity
+  - Metadata: `company_id`, `company_slug`, `company_name`, `lead_type`, `lead_product_id`, `quantity`, `page_path`, `domain_source`, `timestamp`
+  - `success_url` pointing to `/{slug}/success?session_id={CHECKOUT_SESSION_ID}`
+  - `cancel_url` pointing back to `/{slug}`
+- Creates a pending order in the `orders` table with a matching `order_items` row
+- Stores the `stripe_session_id` on the order
+- Returns the Stripe checkout URL
 
-**Section 2 — "How It Works"**
-- Bold heading with font-weight treatment
-- Subtitle
-- 5-step horizontal scroll on mobile, row on desktop
-- Each step: numbered badge styled with `primary_color`, step title in `primary_color`, description
-- Steps connected visually with subtle dividers on desktop
-
-**Section 3 — "What Makes [Company Name] Special?"**
-- Rounded container card with subtle border
-- Two feature cards side by side: `Sparkles` icon for Fresh Leads, `Clock` for Aged Leads
-- Bottom quality assurance pill badge using `accent_color`
-
-**Color adaptation logic:**
-- Dark mode: card backgrounds use `rgba(255,255,255,0.04)`, borders `rgba(255,255,255,0.06)`, text white/dimmed
-- Light mode: card backgrounds use `rgba(0,0,0,0.02)`, borders `rgba(0,0,0,0.05)`, text dark/dimmed
-
-**Layout order on the page:**
-```text
-[Header: Logo + Company Name]
-[Pricing Cards Grid]
-── NEW SECTIONS BELOW ──
-[What Makes X Special?]
-[Why Choose X Leads]
-[How It Works]
-[Footer]
+Config update in `supabase/config.toml`:
+```toml
+[functions.create-checkout]
+verify_jwt = false
 ```
 
-No new files, no database migrations, no new dependencies — everything is added inside `BrandedPricing.tsx` using icons already available from `lucide-react`.
+#### 2. Backend Function: `verify-payment`
+
+A new edge function at `supabase/functions/verify-payment/index.ts` that:
+
+- Accepts: `session_id`
+- Retrieves the Stripe Checkout session
+- If payment succeeded, updates the order status from `pending` to `completed` and stores the `stripe_payment_intent_id`
+- Returns the order details for the success page
+
+Config update:
+```toml
+[functions.verify-payment]
+verify_jwt = false
+```
+
+#### 3. Frontend: Wire Up the Buy Button
+
+**Modify `src/components/branded/BrandedPricingCard.tsx`:**
+- The `onOrder` callback already exists and is wired to the CTA button
+- No changes needed in this file
+
+**Modify `src/pages/BrandedPricing.tsx`:**
+- Update `handleOrder` to call `supabase.functions.invoke('create-checkout')` with all required metadata
+- On success, redirect to the Stripe checkout URL via `window.location.href`
+- Show a loading/spinner state on the button while the checkout session is being created
+
+#### 4. Success Page
+
+**Create `src/pages/CheckoutSuccess.tsx`:**
+- Reads `session_id` from URL query params
+- Calls `supabase.functions.invoke('verify-payment')` to confirm payment and update order status
+- Shows a branded confirmation with:
+  - Company logo and name (fetched via slug)
+  - "Payment Successful" message
+  - Order summary (lead type, quantity, total)
+  - Company contact email link
+- Styled to match the branded page theme (dark/light mode, company colors)
+
+**Update `src/App.tsx`:**
+- Add route: `/:slug/success` → `CheckoutSuccess`
+- Place it before the `/:slug` catch-all route
+
+#### 5. Database
+
+No schema changes needed. The existing `orders` and `order_items` tables already have all required columns (`stripe_session_id`, `stripe_payment_intent_id`, `company_id`, `company_slug`, `status`, etc.).
+
+RLS: The edge functions use the service role key (`SUPABASE_SERVICE_ROLE_KEY` already configured) to insert/update orders, so no new RLS policies are needed for the public checkout flow.
+
+---
+
+### Flow Summary
+
+```text
+Customer clicks "Order Now"
+  → Frontend calls create-checkout edge function
+  → Edge function creates Stripe session + pending order
+  → Customer redirected to Stripe Checkout
+  → Customer pays
+  → Stripe redirects to /{slug}/success?session_id=...
+  → Success page calls verify-payment edge function
+  → Order status updated to "completed"
+  → Customer sees confirmation
+  → Admin sees new order in dashboard (real-time)
+```
+
+### Files to Create
+- `supabase/functions/create-checkout/index.ts`
+- `supabase/functions/verify-payment/index.ts`
+- `src/pages/CheckoutSuccess.tsx`
+
+### Files to Modify
+- `supabase/config.toml` — add function configs
+- `src/pages/BrandedPricing.tsx` — update `handleOrder`
+- `src/App.tsx` — add success route
+
